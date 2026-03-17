@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload Clip - Rocket League Central</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="css/tailwind.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Nunito:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-[#07080f] min-h-screen text-white overflow-x-hidden" style="font-family:'Inter',system-ui,sans-serif">
+
+  <!-- Background orbs -->
+  <div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+    <div class="orb orb-blue w-[400px] h-[400px] -top-32 -left-32 animate-drift"></div>
+    <div class="orb orb-purple w-[350px] h-[350px] bottom-0 right-0 animate-drift" style="animation-delay:-10s"></div>
+  </div>
+  <div class="fixed inset-0 -z-10 bg-grid-pattern opacity-[0.03]"></div>
+
+  <!-- Navbar -->
+  <nav class="fixed top-0 w-full z-50 backdrop-blur-md bg-black/40 border-b border-white/[0.06] transition-all duration-500">
+    <div class="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+      <a href="Home.html" class="flex items-center gap-3 group">
+        <img src="logo.png" alt="RL Central" class="w-10 h-10 rounded-xl shadow-lg shadow-indigo-500/20 group-hover:shadow-indigo-500/40 transition-shadow object-cover">
+        <span class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">RL Central</span>
+      </a>
+      <a href="Home.html" class="btn-secondary !py-2 !px-5 text-sm flex items-center gap-2">
+        <i class="fas fa-arrow-left"></i> Back
+      </a>
+    </div>
+  </nav>
+
+  <div class="pt-28 pb-16 max-w-2xl mx-auto px-6">
+    <!-- Header -->
+    <div class="text-center mb-10 slide-in">
+      <div class="inline-flex items-center gap-2 badge mb-6">
+        <i class="fas fa-cloud-arrow-up text-xs"></i> Upload Center
+      </div>
+      <h1 class="text-4xl font-black tracking-tight mb-4">Upload Your Clip</h1>
+      <p class="text-white/40 text-lg mb-2">Share your epic Rocket League moment with the community</p>
+      <p class="text-white/25 text-sm">Supports MP4, WebM, MOV &middot; Max 2.5GB</p>
+    </div>
+
+    <!-- Form -->
+    <form id="uploadForm" class="glass-card rounded-3xl p-10 space-y-6 slide-in" style="animation-delay:0.1s" enctype="multipart/form-data">
+      <div>
+        <label class="block text-sm font-semibold mb-2 text-white/70">Title</label>
+        <input type="text" id="title" required
+               class="input-field"
+               placeholder="What an insane aerial!">
+      </div>
+
+      <div>
+        <label class="block text-sm font-semibold mb-2 text-white/70">Description <span class="text-white/30">(optional)</span></label>
+        <textarea id="description" rows="4"
+                  class="input-field resize-vertical !rounded-2xl"
+                  placeholder="Tell everyone about this amazing play..."></textarea>
+      </div>
+
+      <div>
+        <label class="block text-sm font-semibold mb-2 text-white/70">Tags <span class="text-white/30">(optional)</span></label>
+        <div class="flex flex-wrap gap-2 mb-3" id="tagsList">
+          <button type="button" class="tag-btn" data-tag="aerial">Aerial</button>
+          <button type="button" class="tag-btn" data-tag="ceiling shot">Ceiling Shot</button>
+          <button type="button" class="tag-btn" data-tag="flip reset">Flip Reset</button>
+          <button type="button" class="tag-btn" data-tag="double tap">Double Tap</button>
+          <button type="button" class="tag-btn" data-tag="musty flick">Musty Flick</button>
+          <button type="button" class="tag-btn" data-tag="pinch">Pinch</button>
+          <button type="button" class="tag-btn" data-tag="save">Save</button>
+          <button type="button" class="tag-btn" data-tag="team play">Team Play</button>
+          <button type="button" class="tag-btn" data-tag="demo">Demo</button>
+          <button type="button" class="tag-btn" data-tag="redirect">Redirect</button>
+          <button type="button" class="tag-btn" data-tag="freestyle">Freestyle</button>
+          <button type="button" class="tag-btn" data-tag="funny">Funny</button>
+        </div>
+        <input type="text" id="customTag" placeholder="Add custom tag and press Enter"
+               class="input-field !text-sm !py-2 !rounded-xl">
+        <div id="selectedTags" class="flex flex-wrap gap-1 mt-2"></div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-semibold mb-3 text-white/70 flex items-center gap-2">
+          <i class="fas fa-video text-indigo-400"></i> Video Clip
+        </label>
+        <div class="relative">
+          <input type="file" id="video" accept="video/*" required
+                 class="w-full input-field !p-6 file:mr-4 file:py-2.5 file:px-5 file:rounded-xl file:border-0 file:bg-indigo-500/20 file:text-indigo-300 file:text-sm file:font-semibold file:cursor-pointer hover:file:bg-indigo-500/30 file:transition-colors">
+        </div>
+        <p class="mt-2 text-xs text-white/25">Selecting a clip starts the upload. You can launch it after 100%.</p>
+        <div id="videoPreview" class="mt-4 hidden">
+          <video class="w-full max-h-64 rounded-xl object-cover ring-1 ring-white/10" controls></video>
+        </div>
+      </div>
+
+      <!-- Category & Rank -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-semibold mb-2 text-white/70">Category <span class="text-white/30">(optional)</span></label>
+          <select id="category" class="input-field !py-3">
+            <option value="">Select a category</option>
+            <option value="aerial">Aerial</option>
+            <option value="ceiling-shot">Ceiling Shot</option>
+            <option value="flip-reset">Flip Reset</option>
+            <option value="double-tap">Double Tap</option>
+            <option value="musty-flick">Musty Flick</option>
+            <option value="pinch">Pinch</option>
+            <option value="save">Save</option>
+            <option value="team-play">Team Play</option>
+            <option value="demo">Demo</option>
+            <option value="redirect">Redirect</option>
+            <option value="freestyle">Freestyle</option>
+            <option value="funny">Funny</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-2 text-white/70">Your Rank <span class="text-white/30">(optional)</span></label>
+          <select id="rlRank" class="input-field !py-3">
+            <option value="">Select your rank</option>
+            <option value="unranked">Unranked</option>
+            <option value="bronze">Bronze</option>
+            <option value="silver">Silver</option>
+            <option value="gold">Gold</option>
+            <option value="platinum">Platinum</option>
+            <option value="diamond">Diamond</option>
+            <option value="champion">Champion</option>
+            <option value="grand-champion">Grand Champion</option>
+            <option value="ssl">Supersonic Legend</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Trim Controls -->
+      <div>
+        <label class="block text-sm font-semibold mb-2 text-white/70">Trim Video <span class="text-white/30">(optional, in seconds)</span></label>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="text-xs text-white/30 mb-1 block">Start Time</label>
+            <input type="number" id="trimStart" min="0" step="0.1" placeholder="0.0" class="input-field !py-2 !text-sm">
+          </div>
+          <div>
+            <label class="text-xs text-white/30 mb-1 block">End Time</label>
+            <input type="number" id="trimEnd" min="0" step="0.1" placeholder="End" class="input-field !py-2 !text-sm">
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <button type="submit" id="submitBtn" disabled class="w-full btn-primary !py-4 flex items-center justify-center gap-3 text-lg opacity-50 cursor-not-allowed transition-all !rounded-2xl">
+        <i class="fas fa-rocket"></i>
+        <span>Launch Clip</span>
+      </button>
+
+      <!-- Upload progress -->
+      <div id="progressContainer" class="hidden mt-4 space-y-3">
+        <div class="flex justify-between text-sm text-white/50 mb-2">
+          <span id="progressLabel">Waiting for clip upload...</span>
+          <span id="progressPercent" class="font-mono font-semibold text-indigo-400">0%</span>
+        </div>
+        <div class="w-full bg-white/[0.06] rounded-full h-3 overflow-hidden">
+          <div id="progressBar" class="h-3 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-200 shadow-lg shadow-indigo-500/20" style="width: 0%"></div>
+        </div>
+        <div class="flex justify-between text-xs text-white/30">
+          <span id="progressBytes">0 MB / 0 MB</span>
+          <span id="progressEta">ETA --</span>
+        </div>
+        <button type="button" id="cancelUploadBtn" class="hidden w-full btn-danger !py-3 flex items-center justify-center gap-2 text-sm !rounded-2xl mt-3">
+          <i class="fas fa-times"></i>
+          <span>Cancel Upload</span>
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <style>
+    .tag-btn { @apply text-xs px-3 py-1.5 rounded-full transition-all duration-200 cursor-pointer; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.6); }
+    .tag-btn:hover { background: rgba(99,102,241,0.15); border-color: rgba(99,102,241,0.3); color: #a5b4fc; }
+    .tag-btn.selected { background: rgba(99,102,241,0.25); border-color: rgba(99,102,241,0.5); color: #a5b4fc; }
+  </style>
+  <script>
+    const UPLOAD_DRAFT_STORAGE_KEY = 'rlc_upload_draft';
+
+    function resolveApiBase() {
+      const { protocol, hostname, host, origin, port } = window.location;
+
+      if (port === '3000') {
+        return `${protocol}//${hostname}:5000/api`;
+      }
+
+      const forwardedPortMatch = host.match(/^(.*?)-(\d+)\.(.+github\.dev)$/);
+      if (forwardedPortMatch) {
+        const [, prefix] = forwardedPortMatch;
+        return `${protocol}//${prefix}-5000.${forwardedPortMatch[3]}/api`;
+      }
+
+      return `${origin}/api`;
+    }
+
+    const UPLOAD_API = `${resolveApiBase()}/clips`;
+
+    // Verify session on page load; redirect to login if unauthenticated
+    (async function checkAuth() {
+      try {
+        const res = await fetch(`${resolveApiBase()}/users/me`, { credentials: 'include' });
+        if (!res.ok) {
+          window.location.href = 'login.html';
+          return;
+        }
+        window.currentUser = await res.json();
+      } catch {
+        window.location.href = 'login.html';
+      }
+    })();
+
+    const uploadForm = document.getElementById('uploadForm');
+    const videoInput = document.getElementById('video');
+    const videoPreview = document.getElementById('videoPreview');
+
+    // Tag management
+    const selectedTagSet = new Set();
+    document.querySelectorAll('.tag-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tag = btn.dataset.tag;
+        if (selectedTagSet.has(tag)) {
+          selectedTagSet.delete(tag);
+          btn.classList.remove('selected');
+        } else if (selectedTagSet.size < 10) {
+          selectedTagSet.add(tag);
+          btn.classList.add('selected');
+        }
+        renderSelectedTags();
+        saveDraft();
+      });
+    });
+
+    document.getElementById('customTag').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const tag = e.target.value.trim().toLowerCase();
+        if (tag && selectedTagSet.size < 10 && !selectedTagSet.has(tag)) {
+          selectedTagSet.add(tag);
+          renderSelectedTags();
+          saveDraft();
+        }
+        e.target.value = '';
+      }
+    });
+
+    function renderSelectedTags() {
+      document.getElementById('selectedTags').innerHTML = Array.from(selectedTagSet).map(t =>
+        `<span class="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+          #${t} <button type="button" onclick="removeTag('${t}')" class="ml-0.5 hover:text-white">&times;</button>
+        </span>`
+      ).join('');
+    }
+
+    window.removeTag = function(tag) {
+      selectedTagSet.delete(tag);
+      const btn = document.querySelector(`.tag-btn[data-tag="${tag}"]`);
+      if (btn) btn.classList.remove('selected');
+      renderSelectedTags();
+      saveDraft();
+    };
+
+    const submitBtn = document.getElementById('submitBtn');
+    const submitBtnLabel = submitBtn.querySelector('span');
+    const progressContainer = document.getElementById('progressContainer');
+    const progressBar = document.getElementById('progressBar');
+    const progressPercent = document.getElementById('progressPercent');
+    const progressLabel = document.getElementById('progressLabel');
+    const progressBytes = document.getElementById('progressBytes');
+    const progressEta = document.getElementById('progressEta');
+    const cancelUploadBtn = document.getElementById('cancelUploadBtn');
+
+    let currentUploadXhr = null;
+    let currentPreviewUrl = null;
+    let activeUploadId = null;
+    let uploadIsComplete = false;
+    let currentFileSize = 0;
+    let uploadStartedAt = 0;
+
+    function hasDraftContent() {
+      return Boolean(
+        document.getElementById('title').value.trim()
+        || document.getElementById('description').value.trim()
+        || selectedTagSet.size
+        || document.getElementById('category').value
+        || document.getElementById('rlRank').value
+        || document.getElementById('trimStart').value
+        || document.getElementById('trimEnd').value
+        || videoInput.files.length
+      );
+    }
+
+    function saveDraft() {
+      const draft = {
+        title: document.getElementById('title').value,
+        description: document.getElementById('description').value,
+        tags: Array.from(selectedTagSet),
+        category: document.getElementById('category').value,
+        rlRank: document.getElementById('rlRank').value,
+        trimStart: document.getElementById('trimStart').value,
+        trimEnd: document.getElementById('trimEnd').value
+      };
+
+      sessionStorage.setItem(UPLOAD_DRAFT_STORAGE_KEY, JSON.stringify(draft));
+    }
+
+    function restoreDraft() {
+      const rawDraft = sessionStorage.getItem(UPLOAD_DRAFT_STORAGE_KEY);
+      if (!rawDraft) {
+        return;
+      }
+
+      try {
+        const draft = JSON.parse(rawDraft);
+        document.getElementById('title').value = draft.title || '';
+        document.getElementById('description').value = draft.description || '';
+        document.getElementById('category').value = draft.category || '';
+        document.getElementById('rlRank').value = draft.rlRank || '';
+        document.getElementById('trimStart').value = draft.trimStart || '';
+        document.getElementById('trimEnd').value = draft.trimEnd || '';
+
+        selectedTagSet.clear();
+        document.querySelectorAll('.tag-btn').forEach(btn => btn.classList.remove('selected'));
+        (draft.tags || []).forEach(tag => {
+          selectedTagSet.add(tag);
+          const button = document.querySelector(`.tag-btn[data-tag="${tag}"]`);
+          if (button) {
+            button.classList.add('selected');
+          }
+        });
+        renderSelectedTags();
+      } catch {
+        sessionStorage.removeItem(UPLOAD_DRAFT_STORAGE_KEY);
+      }
+    }
+
+    function clearDraft() {
+      sessionStorage.removeItem(UPLOAD_DRAFT_STORAGE_KEY);
+    }
+
+    function formatBytes(bytes) {
+      if (!bytes) {
+        return '0 MB';
+      }
+
+      const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+      let size = bytes;
+      let unitIndex = 0;
+
+      while (size >= 1024 && unitIndex < units.length - 1) {
+        size /= 1024;
+        unitIndex += 1;
+      }
+
+      const precision = unitIndex === 0 ? 0 : size >= 100 ? 0 : size >= 10 ? 1 : 2;
+      return `${size.toFixed(precision)} ${units[unitIndex]}`;
+    }
+
+    function formatDuration(seconds) {
+      if (!Number.isFinite(seconds) || seconds < 1) {
+        return 'less than 1s';
+      }
+
+      const totalSeconds = Math.ceil(seconds);
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const remainingSeconds = totalSeconds % 60;
+
+      if (hours > 0) {
+        return `${hours}h ${minutes}m`;
+      }
+
+      if (minutes > 0) {
+        return `${minutes}m ${remainingSeconds}s`;
+      }
+
+      return `${remainingSeconds}s`;
+    }
+
+    function setLaunchButtonEnabled(isEnabled, label = 'Launch Clip') {
+      submitBtn.disabled = !isEnabled;
+      submitBtnLabel.textContent = label;
+
+      if (isEnabled) {
+        submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        submitBtn.classList.add('hover:bg-green-500/20');
+      } else {
+        submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        submitBtn.classList.remove('hover:bg-green-500/20');
+      }
+    }
+
+    function setCancelButtonVisible(visible) {
+      if (visible) {
+        cancelUploadBtn.classList.remove('hidden');
+      } else {
+        cancelUploadBtn.classList.add('hidden');
+      }
+    }
+
+    function cancelUpload() {
+      if (currentUploadXhr) {
+        currentUploadXhr.abort();
+        currentUploadXhr = null;
+      }
+
+      resetUploadState();
+      videoInput.value = '';
+      videoPreview.classList.add('hidden');
+      if (currentPreviewUrl) {
+        URL.revokeObjectURL(currentPreviewUrl);
+        currentPreviewUrl = null;
+      }
+
+      saveDraft();
+    }
+
+    function resetUploadState({ keepProgressVisible = false } = {}) {
+      activeUploadId = null;
+      uploadIsComplete = false;
+      currentFileSize = 0;
+      uploadStartedAt = 0;
+      setLaunchButtonEnabled(false);
+      setCancelButtonVisible(false);
+
+      progressBar.style.width = '0%';
+      progressPercent.textContent = '0%';
+      progressLabel.textContent = 'Waiting for clip...';
+      progressBytes.textContent = '0 MB / 0 MB';
+      progressEta.textContent = 'ETA --';
+
+      if (!keepProgressVisible) {
+        progressContainer.classList.add('hidden');
+      }
+    }
+
+    function startUpload(file) {
+      if (currentUploadXhr) {
+        currentUploadXhr.abort();
+        currentUploadXhr = null;
+      }
+
+      resetUploadState({ keepProgressVisible: true });
+      currentFileSize = file.size;
+      uploadStartedAt = Date.now();
+
+      progressContainer.classList.remove('hidden');
+      setCancelButtonVisible(true);
+      progressLabel.textContent = 'Starting upload...';
+      progressBytes.textContent = `0 MB / ${formatBytes(file.size)}`;
+      progressEta.textContent = 'ETA calculating...';
+
+      const formData = new FormData();
+      formData.append('video', file);
+
+      const xhr = new XMLHttpRequest();
+      currentUploadXhr = xhr;
+
+      xhr.upload.addEventListener('progress', (event) => {
+        if (!event.lengthComputable) {
+          return;
+        }
+
+        const percent = Math.round((event.loaded / event.total) * 100);
+        const elapsedSeconds = (Date.now() - uploadStartedAt) / 1000;
+        const uploadRate = elapsedSeconds > 0 ? event.loaded / elapsedSeconds : 0;
+        const remainingSeconds = uploadRate > 0 ? (event.total - event.loaded) / uploadRate : Infinity;
+
+        progressBar.style.width = `${percent}%`;
+        progressPercent.textContent = `${percent}%`;
+        progressLabel.textContent = percent < 100 ? 'Uploading clip...' : 'Finishing upload...';
+        progressBytes.textContent = `${formatBytes(event.loaded)} / ${formatBytes(event.total)}`;
+        progressEta.textContent = percent < 100 && Number.isFinite(remainingSeconds)
+          ? `ETA ${formatDuration(remainingSeconds)}`
+          : 'ETA calculating...';
+      });
+
+      xhr.addEventListener('load', () => {
+        if (currentUploadXhr !== xhr) {
+          return;
+        }
+
+        currentUploadXhr = null;
+
+        if (xhr.status >= 200 && xhr.status < 300) {
+          const response = JSON.parse(xhr.responseText);
+          activeUploadId = response.uploadId;
+          uploadIsComplete = true;
+          progressBar.style.width = '100%';
+          progressPercent.textContent = '100%';
+          progressLabel.textContent = 'Upload complete. Ready to launch.';
+          progressBytes.textContent = `${formatBytes(currentFileSize)} / ${formatBytes(currentFileSize)}`;
+          progressEta.textContent = 'ETA 0s';
+          setCancelButtonVisible(false);
+          setLaunchButtonEnabled(true);
+          return;
+        }
+
+        resetUploadState({ keepProgressVisible: true });
+
+        try {
+          const errorResponse = JSON.parse(xhr.responseText);
+          progressLabel.textContent = errorResponse.error || 'Upload failed';
+        } catch {
+          progressLabel.textContent = `Upload failed (status ${xhr.status})`;
+        }
+
+        progressEta.textContent = 'ETA unavailable';
+        alert(progressLabel.textContent);
+      });
+
+      xhr.addEventListener('error', () => {
+        if (currentUploadXhr !== xhr) {
+          return;
+        }
+
+        currentUploadXhr = null;
+        resetUploadState({ keepProgressVisible: true });
+        progressLabel.textContent = 'Upload failed: network error';
+        progressEta.textContent = 'ETA unavailable';
+        alert('Upload failed: network error');
+      });
+
+      xhr.addEventListener('abort', () => {
+        if (currentUploadXhr === xhr) {
+          currentUploadXhr = null;
+        }
+      });
+
+      xhr.open('POST', `${UPLOAD_API}/upload`);
+      xhr.withCredentials = true;
+      xhr.send(formData);
+    }
+    
+    videoInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (currentPreviewUrl) {
+        URL.revokeObjectURL(currentPreviewUrl);
+        currentPreviewUrl = null;
+      }
+
+      if (!file) {
+        videoPreview.classList.add('hidden');
+        resetUploadState();
+        return;
+      }
+
+      currentPreviewUrl = URL.createObjectURL(file);
+      videoPreview.querySelector('video').src = currentPreviewUrl;
+      videoPreview.classList.remove('hidden');
+      saveDraft();
+      startUpload(file);
+    });
+
+    // Prevent default browser behavior that can navigate away when dropping files.
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach((eventName) => {
+      window.addEventListener(eventName, (event) => {
+        event.preventDefault();
+      });
+    });
+
+    uploadForm.addEventListener('drop', (event) => {
+      const droppedFiles = event.dataTransfer?.files;
+      if (!droppedFiles || !droppedFiles.length) {
+        return;
+      }
+
+      const file = droppedFiles[0];
+      if (!file.type.startsWith('video/')) {
+        alert('Please drop a valid video file.');
+        return;
+      }
+
+      videoInput.files = droppedFiles;
+      videoInput.dispatchEvent(new Event('change'));
+    });
+
+    ['title', 'description', 'category', 'rlRank', 'trimStart', 'trimEnd', 'customTag'].forEach((fieldId) => {
+      const field = document.getElementById(fieldId);
+      if (!field) {
+        return;
+      }
+
+      field.addEventListener('input', saveDraft);
+      field.addEventListener('change', saveDraft);
+    });
+
+    window.addEventListener('beforeunload', (event) => {
+      if (!currentUploadXhr && !hasDraftContent()) {
+        return;
+      }
+
+      saveDraft();
+      event.preventDefault();
+      event.returnValue = '';
+    });
+
+    restoreDraft();
+    
+    uploadForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      if (!uploadForm.reportValidity()) {
+        return;
+      }
+
+      if (!uploadIsComplete || !activeUploadId) {
+        alert('Wait for the clip upload to finish before launching it.');
+        return;
+      }
+      
+      const categoryEl = document.getElementById('category');
+      const rlRankEl = document.getElementById('rlRank');
+      const payload = {
+        uploadId: activeUploadId,
+        title: document.getElementById('title').value,
+        description: document.getElementById('description').value,
+        tags: JSON.stringify(Array.from(selectedTagSet)),
+        category: categoryEl ? categoryEl.value || undefined : undefined,
+        rlRank: rlRankEl ? rlRankEl.value || undefined : undefined,
+        trimStart: document.getElementById('trimStart').value ? parseFloat(document.getElementById('trimStart').value) : undefined,
+        trimEnd: document.getElementById('trimEnd').value ? parseFloat(document.getElementById('trimEnd').value) : undefined
+      };
+      
+      setLaunchButtonEnabled(false, 'Publishing...');
+      progressLabel.textContent = 'Publishing clip...';
+      progressEta.textContent = 'Finalizing clip...';
+
+      try {
+        const response = await fetch(UPLOAD_API, {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            window.location.href = 'login.html';
+            return;
+          }
+          const errorResponse = await response.json().catch(() => null);
+          throw new Error(errorResponse?.error || `Upload failed (status ${response.status})`);
+        }
+
+        progressLabel.textContent = 'Clip launched!';
+        progressEta.textContent = 'Redirecting...';
+        clearDraft();
+        setTimeout(() => { window.location.href = 'Home.html'; }, 800);
+      } catch (err) {
+        progressLabel.textContent = err.message || 'Failed to publish clip';
+        progressEta.textContent = 'Ready to retry';
+        setLaunchButtonEnabled(true);
+        alert(progressLabel.textContent);
+      }
+    });
+
+
+    cancelUploadBtn.addEventListener('click', cancelUpload);
+
+
+  </script>
+
+  <!-- Footer -->
+  <footer class="footer py-10 mt-8">
+    <div class="max-w-7xl mx-auto px-6 flex flex-col items-center gap-4">
+      <div class="flex flex-wrap items-center justify-center gap-4 text-sm text-white/30">
+        <a href="Home.html" class="hover:text-white/60 transition-colors">Home</a>
+        <a href="trending.html" class="hover:text-white/60 transition-colors">Trending</a>
+        <a href="highlights.html" class="hover:text-white/60 transition-colors">Highlights</a>
+        <a href="contests.html" class="hover:text-white/60 transition-colors">Contests</a>
+      </div>
+      <p class="text-xs text-white/20">&copy; 2026 Rocket League Central</p>
+    </div>
+  </footer>
+
+  <!-- Mobile Bottom Nav -->
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 glass border-t border-white/[0.08] pb-safe">
+    <div class="flex items-center justify-around py-2">
+      <a href="Home.html" class="flex flex-col items-center gap-0.5 px-3 py-1 text-white/50"><i class="fas fa-home text-lg"></i><span class="text-[10px]">Home</span></a>
+      <a href="trending.html" class="flex flex-col items-center gap-0.5 px-3 py-1 text-white/50"><i class="fas fa-fire text-lg"></i><span class="text-[10px]">Trending</span></a>
+      <a href="upload.html" class="flex flex-col items-center gap-0.5 px-3 py-1"><div class="w-10 h-10 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center -mt-4 shadow-lg shadow-indigo-500/30"><i class="fas fa-plus text-white"></i></div><span class="text-[10px] text-indigo-400">Upload</span></a>
+      <a href="search.html" class="flex flex-col items-center gap-0.5 px-3 py-1 text-white/50"><i class="fas fa-search text-lg"></i><span class="text-[10px]">Search</span></a>
+      <a href="dashboard.html" class="flex flex-col items-center gap-0.5 px-3 py-1 text-white/50"><i class="fas fa-user text-lg"></i><span class="text-[10px]">Profile</span></a>
+    </div>
+  </nav>
+
+  <!-- Keep upload page self-contained to avoid cross-page script side effects. -->
+</body>

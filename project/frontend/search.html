@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Search - Rocket League Central</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="css/tailwind.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Nunito:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-[#07080f] min-h-screen text-white overflow-x-hidden" style="font-family:'Inter',system-ui,sans-serif">
+
+  <!-- Background orbs -->
+  <div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+    <div class="orb orb-cyan w-[350px] h-[350px] top-1/4 -right-32 animate-drift"></div>
+    <div class="orb orb-blue w-[300px] h-[300px] bottom-0 left-0 animate-drift" style="animation-delay:-10s"></div>
+  </div>
+  <div class="fixed inset-0 -z-10 bg-grid-pattern opacity-[0.03]"></div>
+
+  <!-- Navbar -->
+  <nav class="fixed top-0 w-full z-50 backdrop-blur-md bg-black/40 border-b border-white/[0.06] transition-all duration-500">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <a href="Home.html" class="flex items-center gap-3 group">
+        <img src="logo.png" alt="RL Central" class="w-10 h-10 rounded-xl shadow-lg shadow-indigo-500/20 group-hover:shadow-indigo-500/40 transition-shadow object-cover">
+        <span class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">RL Central</span>
+      </a>
+      <div class="flex items-center gap-3">
+        <div class="relative">
+          <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-white/30 text-xs"></i>
+          <input type="text" id="searchInput" data-search-bound placeholder="Search clips…"
+                 class="input-field !py-2.5 !pl-9 !pr-5 !rounded-full !text-sm w-64 sm:w-80">
+        </div>
+        <a href="upload.html" class="btn-primary !py-2 !px-5 text-sm flex items-center gap-2">
+          <i class="fas fa-plus"></i><span class="hidden sm:inline">Upload</span>
+        </a>
+        <div id="userMenu" style="display:none" class="relative flex items-center gap-2 glass rounded-full px-3 py-1.5 cursor-pointer" onclick="toggleProfileDropdown(event)">
+          <img id="userAvatar" class="w-8 h-8 rounded-full ring-2 ring-indigo-500/30" src="">
+          <span id="username" class="font-medium text-sm hidden sm:block"></span>
+          <i class="fas fa-chevron-down text-xs text-white/40 ml-1"></i>
+          <div id="profileDropdown" class="hidden absolute top-full right-0 mt-2 w-52 glass-card rounded-2xl py-2 shadow-2xl z-[100] border border-white/[0.08]">
+            <a href="profile.html" class="flex items-center gap-3 px-4 py-2.5 text-sm text-white/70 hover:text-white hover:bg-white/[0.06] transition-colors"><i class="fas fa-user text-indigo-400 w-5 text-center"></i> Profile</a>
+            <a href="profile.html?settings=1" class="flex items-center gap-3 px-4 py-2.5 text-sm text-white/70 hover:text-white hover:bg-white/[0.06] transition-colors"><i class="fas fa-cog text-purple-400 w-5 text-center"></i> Profile Settings</a>
+            <a href="dashboard.html" class="flex items-center gap-3 px-4 py-2.5 text-sm text-white/70 hover:text-white hover:bg-white/[0.06] transition-colors"><i class="fas fa-th-large text-cyan-400 w-5 text-center"></i> Dashboard</a>
+            <div class="border-t border-white/[0.06] my-1"></div>
+            <a href="/auth/logout" class="flex items-center gap-3 px-4 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-white/[0.06] transition-colors"><i class="fas fa-sign-out-alt w-5 text-center"></i> Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="pt-28 pb-16">
+    <div class="max-w-7xl mx-auto px-6">
+      <!-- Sort & Filter Controls -->
+      <div class="glass-card rounded-2xl p-5 mb-8 slide-in">
+        <div class="flex flex-wrap items-center gap-4">
+          <div class="flex items-center gap-2">
+            <label class="text-sm text-white/40 font-medium">Sort:</label>
+            <select id="sortSelect" class="input-field !py-2 !px-4 !rounded-xl !text-sm !w-auto">
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
+              <option value="most-viewed">Most Viewed</option>
+              <option value="most-liked">Most Liked</option>
+            </select>
+          </div>
+          <div class="flex items-center gap-2">
+            <label class="text-sm text-white/40 font-medium">Tag:</label>
+            <select id="tagFilter" class="input-field !py-2 !px-4 !rounded-xl !text-sm !w-auto">
+              <option value="">All Tags</option>
+            </select>
+          </div>
+          <div class="flex items-center gap-2">
+            <label class="text-sm text-white/40 font-medium">Category:</label>
+            <select id="categoryFilter" class="input-field !py-2 !px-4 !rounded-xl !text-sm !w-auto">
+              <option value="">All Categories</option>
+              <option value="aerial">Aerial</option>
+              <option value="ceiling-shot">Ceiling Shot</option>
+              <option value="flip-reset">Flip Reset</option>
+              <option value="double-tap">Double Tap</option>
+              <option value="musty-flick">Musty Flick</option>
+              <option value="pinch">Pinch</option>
+              <option value="save">Save</option>
+              <option value="team-play">Team Play</option>
+              <option value="demo">Demo</option>
+              <option value="redirect">Redirect</option>
+              <option value="freestyle">Freestyle</option>
+              <option value="funny">Funny</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="flex items-center gap-2">
+            <label class="text-sm text-white/40 font-medium">Rank:</label>
+            <select id="rankFilter" class="input-field !py-2 !px-4 !rounded-xl !text-sm !w-auto">
+              <option value="">All Ranks</option>
+              <option value="unranked">Unranked</option>
+              <option value="bronze">Bronze</option>
+              <option value="silver">Silver</option>
+              <option value="gold">Gold</option>
+              <option value="platinum">Platinum</option>
+              <option value="diamond">Diamond</option>
+              <option value="champion">Champion</option>
+              <option value="grand-champion">Grand Champion</option>
+              <option value="ssl">Supersonic Legend</option>
+            </select>
+          </div>
+          <button onclick="applyFilters()" class="btn-primary !py-2 !px-5 text-sm !rounded-xl">
+            <i class="fas fa-search mr-1.5"></i>Apply
+          </button>
+        </div>
+      </div>
+
+      <div id="searchResults" class="min-h-[60vh]">
+        <!-- Default state -->
+        <div class="text-center py-24 slide-in">
+          <div class="w-24 h-24 rounded-3xl bg-white/[0.04] mx-auto mb-8 flex items-center justify-center">
+            <i class="fas fa-search text-4xl text-white/15"></i>
+          </div>
+          <h2 class="text-3xl font-bold text-white/30 mb-4">Search Rocket League Clips</h2>
+          <p class="text-lg text-white/20 max-w-md mx-auto leading-relaxed">
+            Try searching for &ldquo;aerial&rdquo;, &ldquo;demo&rdquo;, &ldquo;ceiling shot&rdquo;, or your favorite player!
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer py-10 mt-8">
+    <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <img src="logo.png" alt="RL Central" class="w-8 h-8 rounded-lg object-cover">
+        <span class="font-bold text-white/40">RL Central</span>
+      </div>
+      <div class="flex flex-wrap items-center justify-center gap-4 text-sm text-white/30">
+        <a href="Home.html" class="hover:text-white/60 transition-colors">Home</a>
+        <a href="highlights.html" class="hover:text-white/60 transition-colors">Highlights</a>
+        <a href="playlists.html" class="hover:text-white/60 transition-colors">Playlists</a>
+        <a href="contests.html" class="hover:text-white/60 transition-colors">Contests</a>
+      </div>
+      <p class="text-xs text-white/20">&copy; 2026 Rocket League Central</p>
+    </div>
+  </footer>
+
+  <!-- Mobile Bottom Nav -->
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 glass border-t border-white/[0.08] pb-safe">
+    <div class="flex items-center justify-around py-2">
+      <a href="Home.html" class="flex flex-col items-center gap-0.5 px-3 py-1 text-white/50"><i class="fas fa-home text-lg"></i><span class="text-[10px]">Home</span></a>
+      <a href="trending.html" class="flex flex-col items-center gap-0.5 px-3 py-1 text-white/50"><i class="fas fa-fire text-lg"></i><span class="text-[10px]">Trending</span></a>
+      <a href="upload.html" class="flex flex-col items-center gap-0.5 px-3 py-1"><div class="w-10 h-10 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center -mt-4 shadow-lg shadow-indigo-500/30"><i class="fas fa-plus text-white"></i></div><span class="text-[10px] text-white/50">Upload</span></a>
+      <a href="search.html" class="flex flex-col items-center gap-0.5 px-3 py-1 text-indigo-400"><i class="fas fa-search text-lg"></i><span class="text-[10px]">Search</span></a>
+      <a href="dashboard.html" class="flex flex-col items-center gap-0.5 px-3 py-1 text-white/50"><i class="fas fa-user text-lg"></i><span class="text-[10px]">Profile</span></a>
+    </div>
+  </nav>
+
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const query = urlParams.get('q') || '';
+    const tagParam = urlParams.get('tag') || '';
+    
+    document.getElementById('searchInput').value = query;
+    let currentPage = 1;
+
+    // Load tags for filter
+    async function loadTagFilter() {
+      try {
+        const res = await fetch('/api/clips/tags');
+        const tags = await res.json();
+        const select = document.getElementById('tagFilter');
+        tags.forEach(t => {
+          const opt = document.createElement('option');
+          opt.value = t;
+          opt.textContent = t;
+          if (t === tagParam) opt.selected = true;
+          select.appendChild(opt);
+        });
+      } catch (e) {}
+    }
+
+    async function doSearch(searchQuery, page = 1) {
+      const sort = document.getElementById('sortSelect').value;
+      const tag = document.getElementById('tagFilter').value;
+      
+      const category = document.getElementById('categoryFilter').value;
+      const rank = document.getElementById('rankFilter').value;
+      let endpoint = `/api/clips?page=${page}&sort=${sort}`;
+      if (searchQuery) endpoint += `&search=${encodeURIComponent(searchQuery)}`;
+      if (tag) endpoint += `&tag=${encodeURIComponent(tag)}`;
+      if (category) endpoint += `&category=${encodeURIComponent(category)}`;
+      if (rank) endpoint += `&rlRank=${encodeURIComponent(rank)}`;
+
+      try {
+        const res = await fetch(endpoint);
+        const data = await res.json();
+        const clips = data.clips || [];
+        
+        const container = document.getElementById('searchResults');
+        if (clips.length === 0 && page === 1) {
+          container.innerHTML = `
+            <div class="text-center py-24 slide-in">
+              <div class="w-24 h-24 rounded-3xl bg-white/[0.04] mx-auto mb-8 flex items-center justify-center">
+                <i class="fas fa-video-slash text-4xl text-white/15"></i>
+              </div>
+              <h2 class="text-3xl font-bold text-white/30 mb-4">No clips found</h2>
+              <p class="text-lg text-white/20 max-w-md mx-auto">Try different search terms or filters</p>
+            </div>`;
+        } else if (page === 1) {
+          const headerText = searchQuery ? `Found ${data.total} clips for "${searchQuery}"` : `${data.total} clips`;
+          container.innerHTML = `
+            <div class="mb-10">
+              <h2 class="section-heading text-3xl">${headerText}</h2>
+              ${tag ? `<p class="text-white/40 mt-1">Tag: <span class="text-indigo-300">#${tag}</span></p>` : ''}
+            </div>
+            <div id="clipsGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 stagger"></div>
+            ${data.pages > 1 ? '<div id="loadMoreContainer" class="text-center mt-10"></div>' : ''}`;
+          document.getElementById('clipsGrid').innerHTML = clips.map(c => renderClipCard(c)).join('');
+          if (data.pages > 1) {
+            document.getElementById('loadMoreContainer').innerHTML = `
+              <button onclick="loadMore()" class="btn-secondary !py-3 !px-8 text-sm !rounded-xl" id="loadMoreBtn">
+                Load More <i class="fas fa-arrow-down ml-2"></i>
+              </button>`;
+          }
+          currentPage = 1;
+        } else {
+          // Append
+          const grid = document.getElementById('clipsGrid');
+          if (grid) grid.innerHTML += clips.map(c => renderClipCard(c)).join('');
+          if (currentPage >= data.pages) {
+            const btn = document.getElementById('loadMoreBtn');
+            if (btn) btn.remove();
+          }
+        }
+      } catch (err) {
+        console.error('Search error:', err);
+      }
+    }
+
+    function loadMore() {
+      currentPage++;
+      doSearch(query, currentPage);
+    }
+
+    function applyFilters() {
+      const q = document.getElementById('searchInput').value.trim();
+      const tag = document.getElementById('tagFilter').value;
+      const category = document.getElementById('categoryFilter').value;
+      const rank = document.getElementById('rankFilter').value;
+      let url = 'search.html?';
+      if (q) url += `q=${encodeURIComponent(q)}&`;
+      if (tag) url += `tag=${encodeURIComponent(tag)}&`;
+      if (category) url += `category=${encodeURIComponent(category)}&`;
+      if (rank) url += `rlRank=${encodeURIComponent(rank)}&`;
+      window.location.href = url;
+    }
+    
+    // Always load clips — show all when no search/tag specified
+    doSearch(query);
+    
+    document.getElementById('searchInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        applyFilters();
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', loadTagFilter);
+  </script>
+  <script src="js/leaderboard-bar.js"></script>
+  <script src="js/settings.js"></script>
+</body>
+

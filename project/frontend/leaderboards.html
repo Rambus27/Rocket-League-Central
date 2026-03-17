@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leaderboards - Rocket League Central</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="css/tailwind.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Nunito:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-[#07080f] min-h-screen text-white overflow-x-hidden" style="font-family:'Inter',system-ui,sans-serif">
+
+  <!-- Background orbs -->
+  <div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+    <div class="orb orb-orange w-[450px] h-[450px] -top-40 -left-40 animate-drift"></div>
+    <div class="orb orb-pink w-[350px] h-[350px] bottom-0 right-0 animate-drift" style="animation-delay:-12s"></div>
+  </div>
+  <div class="fixed inset-0 -z-10 bg-grid-pattern opacity-[0.03]"></div>
+
+  <!-- Navbar -->
+  <nav class="fixed top-0 w-full z-50 backdrop-blur-md bg-black/40 border-b border-white/[0.06] transition-all duration-500">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <a href="Home.html" class="flex items-center gap-3 group">
+        <img src="logo.png" alt="RL Central" class="w-10 h-10 rounded-xl shadow-lg shadow-indigo-500/20 group-hover:shadow-indigo-500/40 transition-shadow object-cover">
+        <span class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">RL Central</span>
+      </a>
+      <div class="flex items-center gap-3">
+        <a href="Home.html" class="btn-secondary !py-2 !px-5 text-sm flex items-center gap-2">
+          <i class="fas fa-home"></i> Home
+        </a>
+        <a href="trending.html" class="btn-secondary !py-2 !px-5 text-sm flex items-center gap-2">
+          <i class="fas fa-fire"></i><span class="hidden sm:inline">Trending</span>
+        </a>
+        <a href="upload.html" class="btn-primary !py-2 !px-5 text-sm flex items-center gap-2">
+          <i class="fas fa-plus"></i><span class="hidden sm:inline">Upload</span>
+        </a>
+        <button id="themeToggle" class="w-9 h-9 rounded-full glass flex items-center justify-center hover:bg-white/10 transition" title="Toggle theme">
+          <i class="fas fa-sun text-sm text-amber-300" id="themeIcon"></i>
+        </button>
+        <div id="userMenu" style="display:none" class="relative flex items-center gap-2 glass rounded-full px-3 py-1.5 cursor-pointer" onclick="toggleProfileDropdown(event)">
+          <img id="userAvatar" class="w-8 h-8 rounded-full ring-2 ring-indigo-500/30" src="">
+          <span id="username" class="font-medium text-sm hidden sm:block"></span>
+          <i class="fas fa-chevron-down text-xs text-white/40 ml-1"></i>
+          <div id="profileDropdown" class="hidden absolute top-full right-0 mt-2 w-52 glass-card rounded-2xl py-2 shadow-2xl z-[100] border border-white/[0.08]">
+            <a href="profile.html" class="flex items-center gap-3 px-4 py-2.5 text-sm text-white/70 hover:text-white hover:bg-white/[0.06] transition-colors"><i class="fas fa-user text-indigo-400 w-5 text-center"></i> Profile</a>
+            <a href="profile.html?settings=1" class="flex items-center gap-3 px-4 py-2.5 text-sm text-white/70 hover:text-white hover:bg-white/[0.06] transition-colors"><i class="fas fa-cog text-purple-400 w-5 text-center"></i> Profile Settings</a>
+            <a href="dashboard.html" class="flex items-center gap-3 px-4 py-2.5 text-sm text-white/70 hover:text-white hover:bg-white/[0.06] transition-colors"><i class="fas fa-th-large text-cyan-400 w-5 text-center"></i> Dashboard</a>
+            <div class="border-t border-white/[0.06] my-1"></div>
+            <a href="/auth/logout" class="flex items-center gap-3 px-4 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-white/[0.06] transition-colors"><i class="fas fa-sign-out-alt w-5 text-center"></i> Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="pt-28 pb-16">
+    <div class="max-w-5xl mx-auto px-6">
+      <!-- Header -->
+      <div class="text-center mb-16 slide-in">
+        <div class="inline-flex items-center gap-2 badge !bg-amber-500/15 !text-amber-300 !border-amber-500/20 mb-6">
+          <i class="fas fa-trophy text-xs"></i> Top creators
+        </div>
+        <h1 class="text-5xl md:text-6xl font-black tracking-tight mb-4">
+          <span class="bg-gradient-to-r from-amber-400 via-yellow-400 to-orange-400 bg-clip-text text-transparent gradient-shift">Leaderboards</span>
+        </h1>
+        <p class="text-lg text-white/40 max-w-2xl mx-auto">Top 10 creators ranked by combined views and likes</p>
+      </div>
+
+      <!-- Top 3 Podium -->
+      <div id="podium" class="flex items-end justify-center gap-4 mb-12"></div>
+
+      <!-- Full Leaderboard Table -->
+      <div class="glass-card rounded-2xl overflow-hidden">
+        <div class="px-6 py-4 border-b border-white/[0.06] flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <i class="fas fa-ranking-star text-amber-400"></i>
+            <h2 class="font-bold text-lg">Top 10</h2>
+          </div>
+          <div class="flex items-center gap-8 text-[10px] uppercase tracking-widest text-white/30 font-semibold pr-2">
+            <span class="w-20 text-center"><i class="fas fa-eye text-emerald-400/50 mr-1"></i>Views</span>
+            <span class="w-20 text-center"><i class="fas fa-heart text-pink-400/50 mr-1"></i>Likes</span>
+            <span class="w-20 text-center"><i class="fas fa-chart-simple text-amber-400/50 mr-1"></i>Total</span>
+          </div>
+        </div>
+        <div id="leaderboardTable" class="divide-y divide-white/[0.04]"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer py-10 mt-8 pb-24 md:pb-10">
+    <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <img src="logo.png" alt="RL Central" class="w-8 h-8 rounded-lg object-cover">
+        <span class="font-bold text-white/40">RL Central</span>
+      </div>
+      <div class="flex items-center gap-4 text-xs text-white/30">
+        <a href="Home.html" class="hover:text-white/60 transition">Home</a>
+        <a href="highlights.html" class="hover:text-white/60 transition">Highlights</a>
+        <a href="playlists.html" class="hover:text-white/60 transition">Playlists</a>
+        <a href="contests.html" class="hover:text-white/60 transition">Contests</a>
+        <a href="leaderboards.html" class="hover:text-white/60 transition">Leaderboards</a>
+        <a href="https://discord.gg/XBATAu84ZT" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-[#5865F2] hover:text-[#5865F2]/80 transition">
+          <i class="fab fa-discord"></i> Discord
+        </a>
+      </div>
+      <p class="text-xs text-white/20">&copy; 2026 Rocket League Central</p>
+    </div>
+  </footer>
+
+  <!-- Mobile Bottom Nav -->
+  <nav class="fixed bottom-0 inset-x-0 z-50 md:hidden glass border-t border-white/10 pb-safe">
+    <div class="flex items-center justify-around py-2">
+      <a href="Home.html" class="flex flex-col items-center gap-0.5 text-white/40 hover:text-white/80 transition text-xs"><i class="fas fa-home text-base"></i>Home</a>
+      <a href="trending.html" class="flex flex-col items-center gap-0.5 text-white/40 hover:text-white/80 transition text-xs"><i class="fas fa-fire text-base"></i>Trending</a>
+      <a href="upload.html" class="flex flex-col items-center gap-0.5 text-indigo-400 hover:text-indigo-300 transition text-xs"><i class="fas fa-plus-circle text-lg"></i>Upload</a>
+      <a href="search.html" class="flex flex-col items-center gap-0.5 text-white/40 hover:text-white/80 transition text-xs"><i class="fas fa-search text-base"></i>Search</a>
+      <a href="dashboard.html" class="flex flex-col items-center gap-0.5 text-white/40 hover:text-white/80 transition text-xs"><i class="fas fa-user text-base"></i>Profile</a>
+    </div>
+  </nav>
+
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+
+    async function loadLeaderboard() {
+      try {
+        const res = await fetch(API_BASE + '/users/leaderboard');
+        const users = await res.json();
+
+        // Top 3 podium
+        const top3 = users.slice(0, 3);
+        const podiumOrder = [1, 0, 2]; // 2nd, 1st, 3rd
+        const podiumHeights = ['h-36', 'h-48', 'h-28'];
+        const podiumColors = [
+          'from-gray-300 to-gray-400',
+          'from-amber-400 to-yellow-500',
+          'from-orange-600 to-orange-700'
+        ];
+        const medals = ['🥈', '🥇', '🥉'];
+
+        document.getElementById('podium').innerHTML = podiumOrder.map((idx, i) => {
+          const u = top3[idx];
+          if (!u) return '';
+          return `
+            <div class="flex flex-col items-center slide-in" style="animation-delay:${i * 0.15}s">
+              <img src="${u.avatar || 'https://via.placeholder.com/80'}" class="w-16 h-16 rounded-full ring-2 ${idx === 0 ? 'ring-amber-400 shadow-lg shadow-amber-500/30' : 'ring-white/20'} mb-2">
+              <span class="text-2xl mb-1">${medals[i]}</span>
+              <a href="profile.html?id=${u._id}" class="font-bold text-sm hover:text-indigo-300 transition">${u.displayName || u.username}</a>
+              <div class="flex items-center gap-3 mt-1 text-xs">
+                <span class="text-emerald-400"><i class="fas fa-eye" style="font-size:10px"></i> ${u.totalViews.toLocaleString()}</span>
+                <span class="text-pink-400"><i class="fas fa-heart" style="font-size:10px"></i> ${u.totalLikes.toLocaleString()}</span>
+              </div>
+              <div class="w-20 ${podiumHeights[i]} mt-3 rounded-t-xl bg-gradient-to-t ${podiumColors[i]} opacity-30"></div>
+            </div>
+          `;
+        }).join('');
+
+        // Full table
+        document.getElementById('leaderboardTable').innerHTML = users.map((u, i) => `
+          <div class="px-6 py-4 flex items-center gap-4 hover:bg-white/[0.02] transition ${i < 3 ? 'bg-amber-500/[0.03]' : ''}">
+            <span class="w-8 text-center font-bold ${i === 0 ? 'text-amber-400' : i === 1 ? 'text-gray-300' : i === 2 ? 'text-orange-500' : 'text-white/30'} text-lg">${i + 1}</span>
+            <img src="${u.avatar || 'https://via.placeholder.com/40'}" class="w-10 h-10 rounded-full ring-1 ring-white/10">
+            <div class="flex-1 min-w-0">
+              <a href="profile.html?id=${u._id}" class="font-semibold hover:text-indigo-300 transition">${u.displayName || u.username}</a>
+              <div class="text-xs text-white/30 mt-0.5">${u.clipsCount} clip${u.clipsCount !== 1 ? 's' : ''}</div>
+            </div>
+            <div class="flex items-center gap-8 text-sm">
+              <div class="w-20 text-center">
+                <div class="font-bold text-emerald-400" id="views-${u._id}">${u.totalViews.toLocaleString()}</div>
+              </div>
+              <div class="w-20 text-center">
+                <div class="font-bold text-pink-400" id="likes-${u._id}">${u.totalLikes.toLocaleString()}</div>
+              </div>
+              <div class="w-20 text-center">
+                <div class="font-bold text-amber-400" id="total-${u._id}">${u.score.toLocaleString()}</div>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      } catch (err) {
+        document.getElementById('leaderboardTable').innerHTML = '<p class="p-6 text-white/40 text-center">Failed to load leaderboard.</p>';
+      }
+    }
+
+    // Auto-refresh every 30 seconds to keep counts current
+    let refreshInterval;
+    document.addEventListener('DOMContentLoaded', () => {
+      checkAuth();
+      loadLeaderboard();
+      refreshInterval = setInterval(loadLeaderboard, 30000);
+    });
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) { clearInterval(refreshInterval); }
+      else { loadLeaderboard(); refreshInterval = setInterval(loadLeaderboard, 30000); }
+    });
+  </script>
+  <script src="js/leaderboard-bar.js"></script>
+  <script src="js/settings.js"></script>
+</body>

@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Rocket League Central</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="css/tailwind.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Nunito:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-[#07080f] min-h-screen text-white overflow-x-hidden" style="font-family:'Inter',system-ui,sans-serif">
+
+  <!-- Background orbs -->
+  <div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+    <div class="orb orb-purple w-[400px] h-[400px] -top-32 right-0 animate-drift"></div>
+    <div class="orb orb-blue w-[350px] h-[350px] bottom-0 -left-20 animate-drift" style="animation-delay:-10s"></div>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="fixed top-0 w-full z-50 transition-all duration-500 backdrop-blur-md bg-black/40 border-b border-white/[0.06]">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <a href="Home.html" class="flex items-center gap-3 group">
+        <img src="logo.png" alt="RL Central" class="w-10 h-10 rounded-xl shadow-lg shadow-indigo-500/20 group-hover:shadow-indigo-500/40 transition-shadow object-cover">
+        <span class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">Dashboard</span>
+      </a>
+      <div class="flex items-center gap-3">
+        <a href="Home.html" class="btn-secondary !py-2 !px-5 text-sm flex items-center gap-2">
+          <i class="fas fa-home"></i><span class="hidden sm:inline">Home</span>
+        </a>
+        <a href="upload.html" class="btn-primary !py-2 !px-5 text-sm flex items-center gap-2">
+          <i class="fas fa-plus"></i><span class="hidden sm:inline">Upload</span>
+        </a>
+        <button id="themeToggle" class="w-9 h-9 rounded-full glass flex items-center justify-center text-sm hover:bg-white/10 transition-colors" title="Toggle theme">
+          <i class="fas fa-sun"></i>
+        </button>
+
+      </div>
+    </div>
+  </nav>
+
+  <div class="pt-28 pb-16 max-w-7xl mx-auto px-6">
+    <!-- Stats -->
+    <div class="grid grid-cols-1 sm:grid-cols-5 gap-6 mb-14 stagger">
+      <div class="stat-card rounded-2xl slide-in">
+        <div class="absolute top-0 left-0 w-full h-1 rounded-t-2xl bg-gradient-to-r from-indigo-500 to-blue-500"></div>
+        <div class="w-12 h-12 rounded-xl bg-indigo-500/15 mx-auto mb-4 flex items-center justify-center">
+          <i class="fas fa-film text-indigo-400 text-lg"></i>
+        </div>
+        <div class="stat-value text-indigo-400" id="clipsCount">0</div>
+        <div class="stat-label">Clips</div>
+      </div>
+      <div class="stat-card rounded-2xl slide-in">
+        <div class="absolute top-0 left-0 w-full h-1 rounded-t-2xl bg-gradient-to-r from-emerald-500 to-teal-500"></div>
+        <div class="w-12 h-12 rounded-xl bg-emerald-500/15 mx-auto mb-4 flex items-center justify-center">
+          <i class="fas fa-eye text-emerald-400 text-lg"></i>
+        </div>
+        <div class="stat-value text-emerald-400" id="totalViews">0</div>
+        <div class="stat-label">Total Views</div>
+      </div>
+      <div class="stat-card rounded-2xl slide-in">
+        <div class="absolute top-0 left-0 w-full h-1 rounded-t-2xl bg-gradient-to-r from-pink-500 to-rose-500"></div>
+        <div class="w-12 h-12 rounded-xl bg-pink-500/15 mx-auto mb-4 flex items-center justify-center">
+          <i class="fas fa-heart text-pink-400 text-lg"></i>
+        </div>
+        <div class="stat-value text-pink-400" id="totalLikes">0</div>
+        <div class="stat-label">Total Likes</div>
+      </div>
+      <div class="stat-card rounded-2xl slide-in">
+        <div class="absolute top-0 left-0 w-full h-1 rounded-t-2xl bg-gradient-to-r from-yellow-500 to-amber-500"></div>
+        <div class="w-12 h-12 rounded-xl bg-yellow-500/15 mx-auto mb-4 flex items-center justify-center">
+          <i class="fas fa-star text-yellow-400 text-lg"></i>
+        </div>
+        <div class="stat-value text-yellow-400" id="xpCount">0</div>
+        <div class="stat-label">XP</div>
+      </div>
+      <div class="stat-card rounded-2xl slide-in">
+        <div class="absolute top-0 left-0 w-full h-1 rounded-t-2xl bg-gradient-to-r from-cyan-500 to-blue-500"></div>
+        <div class="w-12 h-12 rounded-xl bg-cyan-500/15 mx-auto mb-4 flex items-center justify-center">
+          <i class="fas fa-trophy text-cyan-400 text-lg"></i>
+        </div>
+        <div class="stat-value text-cyan-400" id="xpRankLabel">--</div>
+        <div class="stat-label">Rank</div>
+      </div>
+    </div>
+
+    <!-- Your Clips -->
+    <div class="glass-card rounded-3xl p-8">
+      <div class="flex items-center justify-between mb-8">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-indigo-500/15 flex items-center justify-center">
+            <i class="fas fa-video text-indigo-400"></i>
+          </div>
+          <h2 class="text-2xl font-bold tracking-tight">Your Clips</h2>
+        </div>
+        <span class="badge" id="clipsBadge">0 clips</span>
+      </div>
+      <div id="userClips" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 stagger"></div>
+      <div id="emptyState" class="hidden text-center py-16">
+        <div class="w-20 h-20 rounded-2xl bg-white/[0.04] mx-auto mb-6 flex items-center justify-center">
+          <i class="fas fa-cloud-arrow-up text-3xl text-white/20"></i>
+        </div>
+        <h3 class="text-xl font-bold text-white/40 mb-2">No clips yet</h3>
+        <p class="text-white/25 mb-6">Upload your first Rocket League clip to get started!</p>
+        <a href="upload.html" class="btn-primary inline-flex items-center gap-2">
+          <i class="fas fa-plus"></i> Upload Clip
+        </a>
+      </div>
+    </div>
+
+    <!-- Notifications -->
+    <div id="notificationsSection" class="glass-card rounded-3xl p-8 mt-8">
+      <div class="flex items-center justify-between mb-8">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-purple-500/15 flex items-center justify-center">
+            <i class="fas fa-bell text-purple-400"></i>
+          </div>
+          <h2 class="text-2xl font-bold tracking-tight">Notifications</h2>
+          <span class="badge" id="notifBadge">0 new</span>
+        </div>
+        <button onclick="markAllRead()" class="btn-secondary !py-2 !px-4 text-xs !rounded-xl">Mark all read</button>
+      </div>
+      <div id="notifList" class="space-y-3">
+        <p class="text-white/30 text-sm italic">No notifications yet</p>
+      </div>
+    </div>
+
+    <!-- Admin link (hidden unless admin) -->
+    <div id="adminLink" class="mt-6 hidden">
+      <a href="admin.html" class="glass-card rounded-2xl p-6 flex items-center gap-4 hover:border-red-500/30 transition-colors group">
+        <div class="w-12 h-12 rounded-xl bg-red-500/15 flex items-center justify-center">
+          <i class="fas fa-shield-halved text-red-400 text-lg"></i>
+        </div>
+        <div>
+          <h3 class="font-bold group-hover:text-red-300 transition-colors">Admin Dashboard</h3>
+          <p class="text-sm text-white/30">Manage clips, users, and reports</p>
+        </div>
+        <i class="fas fa-arrow-right ml-auto text-white/20"></i>
+      </a>
+    </div>
+
+    <!-- Achievements -->
+    <div class="glass-card rounded-3xl p-8 mt-8">
+      <div class="flex items-center gap-3 mb-8">
+        <div class="w-10 h-10 rounded-xl bg-yellow-500/15 flex items-center justify-center">
+          <i class="fas fa-trophy text-yellow-400"></i>
+        </div>
+        <h2 class="text-2xl font-bold tracking-tight">Achievements</h2>
+      </div>
+      <div id="achievementsList" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+        <p class="text-white/30 text-sm italic col-span-full">Loading achievements...</p>
+      </div>
+    </div>
+
+    <!-- Bookmarks -->
+    <div class="glass-card rounded-3xl p-8 mt-8">
+      <div class="flex items-center gap-3 mb-8">
+        <div class="w-10 h-10 rounded-xl bg-amber-500/15 flex items-center justify-center">
+          <i class="fas fa-bookmark text-amber-400"></i>
+        </div>
+        <h2 class="text-2xl font-bold tracking-tight">Bookmarks</h2>
+      </div>
+      <div id="bookmarksList" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 stagger">
+        <p class="text-white/30 text-sm italic col-span-full">No bookmarks yet</p>
+      </div>
+    </div>
+
+    <!-- Playlists -->
+    <div class="glass-card rounded-3xl p-8 mt-8">
+      <div class="flex items-center justify-between mb-8">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-cyan-500/15 flex items-center justify-center">
+            <i class="fas fa-list text-cyan-400"></i>
+          </div>
+          <h2 class="text-2xl font-bold tracking-tight">Playlists</h2>
+        </div>
+        <button onclick="createPlaylist()" class="btn-primary !py-2 !px-4 text-sm !rounded-xl">
+          <i class="fas fa-plus mr-1.5"></i>New Playlist
+        </button>
+      </div>
+      <div id="playlistsList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <p class="text-white/30 text-sm italic col-span-full">No playlists yet</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer py-10 mt-8">
+    <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <img src="logo.png" alt="RL Central" class="w-8 h-8 rounded-lg object-cover">
+        <span class="font-bold text-white/40">RL Central</span>
+      </div>
+      <div class="flex flex-wrap items-center justify-center gap-4 text-sm text-white/30">
+        <a href="Home.html" class="hover:text-white/60 transition-colors">Home</a>
+        <a href="highlights.html" class="hover:text-white/60 transition-colors">Highlights</a>
+        <a href="playlists.html" class="hover:text-white/60 transition-colors">Playlists</a>
+        <a href="contests.html" class="hover:text-white/60 transition-colors">Contests</a>
+      </div>
+      <p class="text-xs text-white/20">&copy; 2026 Rocket League Central</p>
+    </div>
+  </footer>
+
+  <!-- Mobile Bottom Nav -->
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 glass border-t border-white/[0.08] pb-safe">
+    <div class="flex items-center justify-around py-2">
+      <a href="Home.html" class="flex flex-col items-center gap-0.5 px-3 py-1 text-white/50"><i class="fas fa-home text-lg"></i><span class="text-[10px]">Home</span></a>
+      <a href="trending.html" class="flex flex-col items-center gap-0.5 px-3 py-1 text-white/50"><i class="fas fa-fire text-lg"></i><span class="text-[10px]">Trending</span></a>
+      <a href="upload.html" class="flex flex-col items-center gap-0.5 px-3 py-1"><div class="w-10 h-10 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center -mt-4 shadow-lg shadow-indigo-500/30"><i class="fas fa-plus text-white"></i></div><span class="text-[10px] text-white/50">Upload</span></a>
+      <a href="search.html" class="flex flex-col items-center gap-0.5 px-3 py-1 text-white/50"><i class="fas fa-search text-lg"></i><span class="text-[10px]">Search</span></a>
+      <a href="dashboard.html" class="flex flex-col items-center gap-0.5 px-3 py-1 text-indigo-400"><i class="fas fa-user text-lg"></i><span class="text-[10px]">Profile</span></a>
+    </div>
+  </nav>
+
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    async function loadDashboard() {
+      try {
+        const res = await fetch('/api/users/me', { credentials: 'include' });
+        const user = await res.json();
+        
+        const clips = user.clips || [];
+        document.getElementById('clipsCount').textContent = clips.length;
+        document.getElementById('clipsBadge').textContent = clips.length + ' clip' + (clips.length !== 1 ? 's' : '');
+        let totalViews = 0, totalLikes = 0;
+        clips.forEach(clip => {
+          totalViews += clip.views;
+          totalLikes += clip.likes;
+        });
+        document.getElementById('totalViews').textContent = totalViews.toLocaleString();
+        document.getElementById('totalLikes').textContent = totalLikes.toLocaleString();
+        document.getElementById('xpCount').textContent = (user.xp || 0).toLocaleString();
+        
+        // Load XP rank
+        try {
+          const xpRes = await fetch('/api/users/xp-rank', { credentials: 'include' });
+          const xpData = await xpRes.json();
+          document.getElementById('xpRankLabel').textContent = xpData.rank || '--';
+        } catch(e) {}
+        
+        // Show admin link
+        if (user.role === 'admin') {
+          document.getElementById('adminLink').classList.remove('hidden');
+        }
+        
+        const container = document.getElementById('userClips');
+        if (clips.length === 0) {
+          document.getElementById('emptyState').classList.remove('hidden');
+          return;
+        }
+
+        container.innerHTML = clips.map(clip => `
+          <div class="glass-card rounded-2xl overflow-hidden group slide-in">
+            <div class="relative img-shine">
+              <img src="${clip.thumbnailPath}" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500" alt="${clip.title}" loading="lazy">
+              <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+              <div class="absolute bottom-3 left-3 flex items-center gap-3 text-xs font-medium">
+                <span class="glass !bg-black/50 px-2.5 py-1 rounded-full flex items-center gap-1"><i class="fas fa-eye text-emerald-400"></i> ${clip.views}</span>
+                <span class="glass !bg-black/50 px-2.5 py-1 rounded-full flex items-center gap-1"><i class="fas fa-heart text-pink-400"></i> ${clip.likes}</span>
+              </div>
+              ${(clip.tags||[]).length ? `<div class="absolute top-2 left-2 flex gap-1">${clip.tags.slice(0,2).map(t=>`<span class="text-[10px] px-1.5 py-0.5 rounded-full bg-indigo-500/30 text-indigo-300">${t}</span>`).join('')}</div>` : ''}
+            </div>
+            <div class="p-5">
+              <h3 class="font-bold text-lg mb-4 line-clamp-1">${clip.title}</h3>
+              <div class="flex gap-2">
+                <a href="watch.html?id=${clip._id}" class="btn-primary flex-1 text-center !py-2.5 text-sm !rounded-xl">
+                  <i class="fas fa-play mr-1.5"></i>Watch
+                </a>
+                <button onclick="deleteClip('${clip._id}')" class="btn-danger flex-1 !py-2.5 text-sm !rounded-xl">
+                  <i class="fas fa-trash mr-1.5"></i>Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+
+        // Load notifications
+        loadNotifications();
+        loadAchievements();
+        loadBookmarks();
+        loadPlaylists();
+        
+      } catch (err) {
+        window.location.href = 'login.html';
+      }
+    }
+
+    async function loadNotifications() {
+      try {
+        const res = await fetch('/api/users/notifications', { credentials: 'include' });
+        const { notifications, unread } = await res.json();
+        document.getElementById('notifBadge').textContent = unread + ' new';
+
+        if (notifications.length === 0) return;
+        
+        const icons = { like: 'fa-heart text-pink-400', comment: 'fa-comment text-indigo-400', follow: 'fa-user-plus text-blue-400' };
+        const labels = { like: 'liked your clip', comment: 'commented on', follow: 'started following you' };
+
+        document.getElementById('notifList').innerHTML = notifications.map(n => `
+          <div class="glass rounded-xl p-4 flex items-center gap-4 ${n.read ? 'opacity-60' : ''}">
+            <img src="${n.from.avatar}" class="w-10 h-10 rounded-full ring-1 ring-white/10">
+            <div class="flex-1 min-w-0">
+              <p class="text-sm"><span class="font-semibold">${n.from.username}</span> <span class="text-white/40">${labels[n.type]}</span>
+                ${n.clip ? ` <a href="watch.html?id=${n.clip._id}" class="text-indigo-300 hover:text-indigo-200">${n.clip.title}</a>` : ''}
+              </p>
+              <p class="text-xs text-white/20 mt-0.5">${new Date(n.createdAt).toLocaleString()}</p>
+            </div>
+            <i class="fas ${icons[n.type]}"></i>
+          </div>
+        `).join('');
+      } catch (e) { /* ignore */ }
+    }
+
+    async function markAllRead() {
+      await fetch('/api/users/notifications/read', {
+        method: 'POST', credentials: 'include'
+      });
+      document.getElementById('notifBadge').textContent = '0 new';
+      loadNotifications();
+    }
+
+    async function loadAchievements() {
+      try {
+        const res = await fetch('/api/users/achievements', { credentials: 'include' });
+        const achievements = await res.json();
+        const container = document.getElementById('achievementsList');
+        if (!achievements.length) {
+          container.innerHTML = '<p class="text-white/30 text-sm italic col-span-full">No achievements data</p>';
+          return;
+        }
+        container.innerHTML = achievements.map(a => `
+          <div class="glass rounded-xl p-4 text-center ${a.unlockedAt ? '' : 'opacity-30'}">
+            <div class="text-3xl mb-2">${a.icon || '🏆'}</div>
+            <h4 class="text-sm font-bold">${a.name}</h4>
+            <p class="text-[10px] text-white/40 mt-1">${a.description}</p>
+            ${a.unlockedAt ? `<p class="text-[10px] text-green-400 mt-2"><i class="fas fa-check mr-1"></i>Unlocked</p>` : '<p class="text-[10px] text-white/20 mt-2">Locked</p>'}
+          </div>
+        `).join('');
+      } catch(e) {}
+    }
+
+    async function loadBookmarks() {
+      try {
+        const res = await fetch('/api/clips/bookmarks', { credentials: 'include' });
+        const bookmarks = await res.json();
+        const container = document.getElementById('bookmarksList');
+        if (!bookmarks.length) return;
+        container.innerHTML = bookmarks.map(b => {
+          const clip = b.clip;
+          if (!clip) return '';
+          return renderClipCard(clip);
+        }).join('');
+      } catch(e) {}
+    }
+
+    async function loadPlaylists() {
+      try {
+        const res = await fetch('/api/playlists/mine', { credentials: 'include' });
+        const playlists = await res.json();
+        const container = document.getElementById('playlistsList');
+        if (!playlists.length) return;
+        container.innerHTML = playlists.map(p => `
+          <a href="playlists.html?id=${p._id}" class="glass rounded-xl p-5 hover:bg-white/[0.06] transition-colors group">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-10 h-10 rounded-lg bg-cyan-500/15 flex items-center justify-center">
+                <i class="fas fa-list text-cyan-400"></i>
+              </div>
+              <div class="flex-1 min-w-0">
+                <h4 class="font-bold text-sm group-hover:text-cyan-300 transition-colors truncate">${p.name}</h4>
+                <p class="text-xs text-white/30">${(p.clips || []).length} clips</p>
+              </div>
+            </div>
+            ${p.description ? `<p class="text-xs text-white/40 line-clamp-2">${p.description}</p>` : ''}
+          </a>
+        `).join('');
+      } catch(e) {}
+    }
+
+    async function createPlaylist() {
+      const name = prompt('Playlist name:');
+      if (!name || !name.trim()) return;
+      try {
+        const res = await fetch('/api/playlists', {
+          method: 'POST', credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: name.trim() })
+        });
+        if (res.ok) loadPlaylists();
+        else alert('Failed to create playlist');
+      } catch(e) { alert('Failed to create playlist'); }
+    }
+    
+    async function deleteClip(id) {
+      if (!confirm('Are you sure you want to delete this clip?')) return;
+      try {
+        await fetch('/api/clips/' + id, { method: 'DELETE', credentials: 'include' });
+        loadDashboard();
+      } catch (err) {
+        console.error('Delete failed');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadDashboard);
+  </script>
+  <script src="js/leaderboard-bar.js"></script>
+  <script src="js/settings.js"></script>
+</body>

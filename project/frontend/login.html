@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Rocket League Central</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="css/tailwind.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Nunito:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-[#07080f] min-h-screen text-white overflow-hidden" style="font-family:'Inter',system-ui,sans-serif">
+
+  <!-- Background orbs -->
+  <div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+    <div class="orb orb-blue w-[500px] h-[500px] top-1/4 -left-40 animate-drift"></div>
+    <div class="orb orb-purple w-[400px] h-[400px] bottom-1/4 -right-40 animate-drift" style="animation-delay:-8s"></div>
+  </div>
+  <div class="fixed inset-0 -z-10 bg-grid-pattern opacity-[0.03]"></div>
+
+  <div class="min-h-screen flex items-center justify-center p-6">
+    <div class="w-full max-w-md">
+      <!-- Card -->
+      <div class="glass-card rounded-3xl p-10 text-center relative overflow-hidden slide-in">
+        <!-- Top gradient bar -->
+        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
+
+        <!-- Logo -->
+        <img src="logo.png" alt="RL Central" class="w-20 h-20 rounded-2xl mx-auto mb-8 shadow-lg shadow-indigo-500/25 object-cover">
+
+        <h1 class="text-3xl font-black tracking-tight mb-3">Welcome to RL Central</h1>
+        <p class="text-white/40 text-lg mb-10 leading-relaxed">Login to upload clips, comment, and follow creators</p>
+
+        <!-- Toggle between Login / Register -->
+        <div class="flex gap-2 mb-6">
+          <button id="tabLogin" onclick="showTab('login')" class="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200" style="background:rgba(99,102,241,0.3);border:1px solid rgba(99,102,241,0.4);color:#fff">Login</button>
+          <button id="tabRegister" onclick="showTab('register')" class="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.5)">Register</button>
+        </div>
+
+        <!-- Login form -->
+        <form id="loginForm" class="space-y-4 text-left">
+          <div>
+            <input type="email" id="loginEmail" required placeholder="Email" class="input-field !py-3 !rounded-xl !text-sm">
+          </div>
+          <div>
+            <input type="password" id="loginPassword" required placeholder="Password" minlength="6" class="input-field !py-3 !rounded-xl !text-sm">
+          </div>
+          <button type="submit" class="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl font-semibold text-white transition-all duration-300" style="background:rgba(99,102,241,0.3);border:1px solid rgba(99,102,241,0.4);" onmouseover="this.style.background='rgba(99,102,241,0.5)'" onmouseout="this.style.background='rgba(99,102,241,0.3)'">
+            <i class="fas fa-sign-in-alt text-lg"></i>
+            Login
+          </button>
+          <p id="loginError" class="text-red-400 text-xs text-center hidden"></p>
+          <p class="text-center mt-3"><a href="forgot-password.html" class="text-xs text-indigo-400 hover:text-indigo-300 transition-colors">Forgot your password?</a></p>
+        </form>
+
+        <!-- Register form (hidden by default) -->
+        <form id="registerForm" class="space-y-4 text-left hidden">
+          <div>
+            <input type="text" id="regUsername" required placeholder="Username" class="input-field !py-3 !rounded-xl !text-sm" pattern="^[a-zA-Z0-9_]{2,30}$">
+          </div>
+          <div>
+            <input type="email" id="regEmail" required placeholder="Email" class="input-field !py-3 !rounded-xl !text-sm">
+          </div>
+          <div>
+            <input type="password" id="regPassword" required placeholder="Password (min 6 chars)" minlength="6" class="input-field !py-3 !rounded-xl !text-sm">
+          </div>
+          <div>
+            <input type="text" id="regDisplayName" placeholder="Display Name (optional)" class="input-field !py-3 !rounded-xl !text-sm" maxlength="50">
+          </div>
+          <button type="submit" class="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl font-semibold text-white transition-all duration-300" style="background:rgba(99,102,241,0.3);border:1px solid rgba(99,102,241,0.4);" onmouseover="this.style.background='rgba(99,102,241,0.5)'" onmouseout="this.style.background='rgba(99,102,241,0.3)'">
+            <i class="fas fa-user-plus text-lg"></i>
+            Create Account
+          </button>
+          <p id="registerError" class="text-red-400 text-xs text-center hidden"></p>
+        </form>
+
+        <div class="divider my-8"></div>
+
+        <!-- Guest login -->
+        <h3 class="text-sm font-semibold uppercase tracking-widest text-white/30 mb-4">Or continue as guest</h3>
+        <form id="guestForm" class="space-y-4 text-left">
+          <div>
+            <input type="text" id="guestUsername" required placeholder="Username" class="input-field !py-3 !rounded-xl !text-sm" pattern="^@?[a-zA-Z0-9_]{2,30}$">
+          </div>
+          <div>
+            <input type="text" id="guestDisplayName" required placeholder="Display Name" class="input-field !py-3 !rounded-xl !text-sm" maxlength="50">
+          </div>
+          <button type="submit" class="w-full btn-primary !py-3.5 flex items-center justify-center gap-2 text-sm !rounded-xl">
+            <i class="fas fa-user"></i> Continue as Guest
+          </button>
+        </form>
+
+        <div class="divider my-8"></div>
+
+        <a href="Home.html" class="btn-secondary w-full !py-3.5 flex items-center justify-center gap-2 text-sm">
+          <i class="fas fa-arrow-left"></i>
+          Back to Home
+        </a>
+      </div>
+
+      <p class="text-center text-white/20 text-xs mt-6 slide-in" style="animation-delay:0.2s">
+        Share your best Rocket League moments
+      </p>
+    </div>
+  </div>
+
+  <script>
+    function showTab(tab) {
+      const loginForm = document.getElementById('loginForm');
+      const registerForm = document.getElementById('registerForm');
+      const tabLogin = document.getElementById('tabLogin');
+      const tabRegister = document.getElementById('tabRegister');
+      const activeStyle = 'background:rgba(99,102,241,0.3);border:1px solid rgba(99,102,241,0.4);color:#fff';
+      const inactiveStyle = 'background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.5)';
+      if (tab === 'login') {
+        loginForm.classList.remove('hidden');
+        registerForm.classList.add('hidden');
+        tabLogin.style.cssText = activeStyle;
+        tabRegister.style.cssText = inactiveStyle;
+      } else {
+        loginForm.classList.add('hidden');
+        registerForm.classList.remove('hidden');
+        tabLogin.style.cssText = inactiveStyle;
+        tabRegister.style.cssText = activeStyle;
+      }
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      const errEl = document.getElementById('loginError');
+      errEl.classList.add('hidden');
+      try {
+        const res = await fetch('/auth/login', {
+          method: 'POST', credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        let data;
+        try { data = await res.json(); } catch { data = {}; }
+        if (res.ok && data.success) { window.location.href = 'dashboard.html'; }
+        else { errEl.textContent = data.error || 'Login failed (status ' + res.status + ')'; errEl.classList.remove('hidden'); }
+      } catch (err) { errEl.textContent = 'Network error: ' + err.message; errEl.classList.remove('hidden'); }
+    });
+
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = document.getElementById('regUsername').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
+      const password = document.getElementById('regPassword').value;
+      const displayName = document.getElementById('regDisplayName').value.trim();
+      const errEl = document.getElementById('registerError');
+      errEl.classList.add('hidden');
+      try {
+        const res = await fetch('/auth/register', {
+          method: 'POST', credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, email, password, displayName })
+        });
+        let data;
+        try { data = await res.json(); } catch { data = {}; }
+        if (res.ok && data.success) { window.location.href = 'dashboard.html'; }
+        else { errEl.textContent = data.error || 'Registration failed (status ' + res.status + ')'; errEl.classList.remove('hidden'); }
+      } catch (err) { errEl.textContent = 'Network error: ' + err.message; errEl.classList.remove('hidden'); }
+    });
+
+    document.getElementById('guestForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = document.getElementById('guestUsername').value.trim();
+      const displayName = document.getElementById('guestDisplayName').value.trim();
+      if (!username || !displayName) return;
+      try {
+        const res = await fetch('/auth/guest', {
+          method: 'POST', credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, displayName })
+        });
+        if (res.ok) { window.location.href = 'dashboard.html'; }
+        else { const data = await res.json(); alert(data.error || 'Login failed'); }
+      } catch { alert('Login failed. Please try again.'); }
+    });
+  </script>
+
+  <!-- Footer -->
+  <footer class="footer py-10 mt-8">
+    <div class="max-w-7xl mx-auto px-6 flex flex-col items-center gap-4">
+      <a href="https://discord.gg/XBATAu84ZT" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#5865F2]/15 border border-[#5865F2]/25 text-[#5865F2] hover:bg-[#5865F2]/25 hover:border-[#5865F2]/40 transition-all duration-300 text-xs font-semibold">
+        <i class="fab fa-discord"></i> Join our Discord
+      </a>
+      <p class="text-xs text-white/20">&copy; 2026 Rocket League Central</p>
+    </div>
+  </footer>
+
+  <script src="js/leaderboard-bar.js"></script>
+  <script src="js/settings.js"></script>
+</body>

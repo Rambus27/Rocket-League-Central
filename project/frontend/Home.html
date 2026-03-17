@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rocket League Central - Clips</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
+  <link href="css/tailwind.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Nunito:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-[#07080f] min-h-screen text-white overflow-x-hidden" style="font-family:'Inter',system-ui,sans-serif">
+
+  <!-- Background orbs -->
+  <div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+    <div class="orb orb-blue w-[500px] h-[500px] -top-40 -left-40 animate-drift"></div>
+    <div class="orb orb-purple w-[400px] h-[400px] top-1/3 right-0 animate-drift" style="animation-delay:-7s"></div>
+    <div class="orb orb-cyan w-[350px] h-[350px] bottom-0 left-1/4 animate-drift" style="animation-delay:-14s"></div>
+  </div>
+
+  <!-- Navbar -->
+  <nav id="navbar" class="fixed top-0 w-full z-50 transition-all duration-500">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <!-- Logo -->
+      <a href="Home.html" class="flex items-center gap-3 group">
+        <img src="logo.png" alt="RL Central" class="w-10 h-10 rounded-xl shadow-lg shadow-indigo-500/20 group-hover:shadow-indigo-500/40 transition-shadow object-cover">
+        <span class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">RL Central</span>
+      </a>
+
+      <!-- Centre nav -->
+      <div class="hidden md:flex items-center gap-1 glass rounded-full px-2 py-1">
+        <a href="Home.html" class="navbar-link bg-white/[0.08]"><i class="fas fa-home mr-1.5 text-indigo-400"></i>Home</a>
+        <a href="trending.html" class="navbar-link"><i class="fas fa-fire mr-1.5 text-orange-400"></i>Trending</a>
+        <a href="leaderboards.html" class="navbar-link"><i class="fas fa-ranking-star mr-1.5 text-yellow-400"></i>Leaderboards</a>
+        <div class="relative ml-1">
+          <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-white/30 text-xs"></i>
+          <input type="text" id="searchInput" placeholder="Search clips…"
+                 class="input-field !py-2 !pl-9 !pr-4 !rounded-full !text-sm w-56 focus:w-72 transition-all duration-300">
+        </div>
+      </div>
+
+      <!-- Right -->
+      <div class="flex items-center gap-3">
+        <button id="themeToggle" class="w-9 h-9 rounded-full glass flex items-center justify-center text-sm hover:bg-white/10 transition-colors" title="Toggle theme">
+          <i class="fas fa-sun"></i>
+        </button>
+        <a href="#" id="notifBell" class="relative w-9 h-9 rounded-full glass flex items-center justify-center text-sm hover:bg-white/10 transition-colors" onclick="window.location.href='dashboard.html#notifications'" title="Notifications">
+          <i class="fas fa-bell"></i>
+          <span id="notifCount" class="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 text-[10px] font-bold flex items-center justify-center" style="display:none">0</span>
+        </a>
+        <a href="upload.html" class="btn-primary !py-2 !px-5 text-sm flex items-center gap-2">
+          <i class="fas fa-plus"></i><span class="hidden sm:inline">Upload</span>
+        </a>
+        <a href="login.html" id="loginBtn" class="btn-secondary !py-2 !px-4 text-sm flex items-center gap-2">
+          <i class="fas fa-sign-in-alt"></i><span class="hidden sm:inline">Login</span>
+        </a>
+        <div id="userMenu" style="display:none" class="relative flex items-center gap-2 glass rounded-full px-3 py-1.5 cursor-pointer" onclick="toggleProfileDropdown(event)">
+          <img id="userAvatar" class="w-8 h-8 rounded-full ring-2 ring-indigo-500/30" src="">
+          <span id="username" class="font-medium text-sm hidden sm:block"></span>
+          <i class="fas fa-chevron-down text-xs text-white/40 ml-1"></i>
+          <div id="profileDropdown" class="hidden absolute top-full right-0 mt-2 w-52 glass-card rounded-2xl py-2 shadow-2xl z-[100] border border-white/[0.08]">
+            <a href="profile.html" class="flex items-center gap-3 px-4 py-2.5 text-sm text-white/70 hover:text-white hover:bg-white/[0.06] transition-colors"><i class="fas fa-user text-indigo-400 w-5 text-center"></i> Profile</a>
+            <a href="profile.html?settings=1" class="flex items-center gap-3 px-4 py-2.5 text-sm text-white/70 hover:text-white hover:bg-white/[0.06] transition-colors"><i class="fas fa-cog text-purple-400 w-5 text-center"></i> Profile Settings</a>
+            <a href="dashboard.html" class="flex items-center gap-3 px-4 py-2.5 text-sm text-white/70 hover:text-white hover:bg-white/[0.06] transition-colors"><i class="fas fa-th-large text-cyan-400 w-5 text-center"></i> Dashboard</a>
+            <div class="border-t border-white/[0.06] my-1"></div>
+            <a href="/auth/logout" class="flex items-center gap-3 px-4 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-white/[0.06] transition-colors"><i class="fas fa-sign-out-alt w-5 text-center"></i> Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="relative pt-32 pb-28 overflow-hidden">
+    <div class="absolute inset-0 bg-grid-pattern opacity-[0.04]"></div>
+    <!-- Radial glow -->
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] rounded-full bg-indigo-600/10 blur-[120px] pointer-events-none"></div>
+
+    <div class="relative max-w-5xl mx-auto px-6 text-center">
+      <div class="inline-flex items-center gap-2 badge mb-8 slide-in">
+        <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+        Community-driven Rocket League clips
+      </div>
+
+      <h1 class="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black leading-[0.95] tracking-tight mb-8 slide-in" style="animation-delay:0.1s">
+        Rocket League<br>
+        <span class="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent gradient-shift">Clips</span>
+      </h1>
+
+      <p class="text-lg md:text-xl text-white/50 max-w-2xl mx-auto mb-4 leading-relaxed slide-in" style="animation-delay:0.2s">
+        Share and discover the most insane Rocket League moments. Upload your clips and start sharing!
+      </p>
+      <p class="text-sm font-bold text-white/70 max-w-xl mx-auto mb-12 slide-in" style="animation-delay:0.25s">
+        Top clips are featured in weekly edits — upload your best clips with the best quality.
+      </p>
+
+      <div class="flex flex-col sm:flex-row gap-4 justify-center items-center slide-in" style="animation-delay:0.3s">
+        <a href="upload.html" class="btn-primary !px-8 !py-4 text-lg flex items-center gap-3 pulse-glow">
+          <i class="fas fa-cloud-arrow-up text-xl"></i>
+          Upload a Clip
+        </a>
+        <a href="trending.html" class="btn-secondary !px-8 !py-4 text-lg flex items-center gap-3">
+          <i class="fas fa-fire"></i>
+          Browse Trending
+        </a>
+        <button id="randomClipBtn" class="btn-secondary !px-8 !py-4 text-lg flex items-center gap-3">
+          <i class="fas fa-shuffle"></i>
+          Random Clip
+        </button>
+      </div>
+      <a href="https://discord.gg/XBATAu84ZT" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2.5 mt-6 px-6 py-3 rounded-full bg-[#5865F2]/20 border border-[#5865F2]/30 text-[#5865F2] hover:bg-[#5865F2]/30 hover:border-[#5865F2]/50 transition-all duration-300 text-sm font-semibold slide-in" style="animation-delay:0.4s">
+        <i class="fab fa-discord text-lg"></i>
+        Join our Discord
+      </a>
+    </div>
+  </section>
+
+  <!-- Featured Clip of the Week -->
+  <section id="featuredSection" class="py-24 relative hidden">
+    <div class="divider mb-24"></div>
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="text-center mb-14">
+        <div class="inline-flex items-center gap-2 badge !bg-yellow-500/15 !text-yellow-300 !border-yellow-500/20 mb-4">
+          <i class="fas fa-star text-xs"></i> Clip of the Week
+        </div>
+        <h2 class="section-heading">Featured Clip</h2>
+      </div>
+      <div id="featuredClip" class="max-w-3xl mx-auto"></div>
+    </div>
+  </section>
+
+  <!-- Newest Clips -->
+  <section class="py-24 relative">
+    <div class="divider mb-24"></div>
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="flex flex-col md:flex-row md:items-end md:justify-between mb-14 gap-4">
+        <div>
+          <h2 class="section-heading">Newest Clips</h2>
+          <p class="text-white/40 text-lg mt-2">Freshly uploaded Rocket League moments</p>
+        </div>
+        <a href="search.html" class="btn-secondary !py-2 !px-5 text-sm flex items-center gap-2 self-start md:self-auto">
+          View all <i class="fas fa-arrow-right text-xs"></i>
+        </a>
+      </div>
+      <div id="newestClips" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 stagger"></div>
+    </div>
+  </section>
+
+  <!-- Trending Clips -->
+  <section class="py-24 relative">
+    <div class="divider mb-24"></div>
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="flex flex-col md:flex-row md:items-end md:justify-between mb-14 gap-4">
+        <div>
+          <h2 class="text-4xl md:text-5xl font-black mb-2 tracking-tight">
+            <span class="bg-gradient-to-r from-orange-400 via-red-400 to-amber-400 bg-clip-text text-transparent gradient-shift">Trending Now</span>
+          </h2>
+          <p class="text-white/40 text-lg mt-2">Most viewed and liked clips right now</p>
+        </div>
+        <a href="trending.html" class="btn-secondary !py-2 !px-5 text-sm flex items-center gap-2 self-start md:self-auto">
+          See all trending <i class="fas fa-arrow-right text-xs"></i>
+        </a>
+      </div>
+      <div id="trendingClips" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 stagger"></div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="py-24 relative">
+    <div class="divider mb-24"></div>
+    <div class="max-w-5xl mx-auto px-6">
+      <div class="text-center mb-16">
+        <h2 class="section-heading">Why RL Central?</h2>
+        <p class="text-white/40 text-lg mt-3 max-w-xl mx-auto">Everything you need to share your greatest Rocket League plays</p>
+      </div>
+      <div class="grid md:grid-cols-3 gap-6 stagger">
+        <div class="glass-card p-8 text-center group">
+          <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 mx-auto mb-6 flex items-center justify-center shadow-lg shadow-indigo-500/20 group-hover:shadow-indigo-500/40 transition-shadow">
+            <i class="fas fa-cloud-arrow-up text-2xl"></i>
+          </div>
+          <h3 class="text-xl font-bold mb-3">Upload Clips</h3>
+          <p class="text-white/40 text-sm leading-relaxed">Share your best Rocket League moments with the community instantly</p>
+        </div>
+        <div class="glass-card p-8 text-center group">
+          <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-500 to-red-500 mx-auto mb-6 flex items-center justify-center shadow-lg shadow-orange-500/20 group-hover:shadow-orange-500/40 transition-shadow">
+            <i class="fas fa-fire-flame-curved text-2xl"></i>
+          </div>
+          <h3 class="text-xl font-bold mb-3">Discover</h3>
+          <p class="text-white/40 text-sm leading-relaxed">Find trending clips and epic plays from the top players worldwide</p>
+        </div>
+        <div class="glass-card p-8 text-center group">
+          <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-pink-500 to-rose-600 mx-auto mb-6 flex items-center justify-center shadow-lg shadow-pink-500/20 group-hover:shadow-pink-500/40 transition-shadow">
+            <i class="fas fa-comments text-2xl"></i>
+          </div>
+          <h3 class="text-xl font-bold mb-3">Connect</h3>
+          <p class="text-white/40 text-sm leading-relaxed">Join the community and share your best Rocket League moments</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick Links Section -->
+  <section class="py-16 relative">
+    <div class="divider mb-16"></div>
+    <div class="max-w-5xl mx-auto px-6">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 stagger">
+        <a href="highlights.html" class="glass-card p-5 text-center group slide-in">
+          <div class="w-12 h-12 rounded-xl bg-yellow-500/15 mx-auto mb-3 flex items-center justify-center">
+            <i class="fas fa-trophy text-yellow-400 text-lg"></i>
+          </div>
+          <h3 class="font-bold text-sm">Highlights</h3>
+          <p class="text-white/30 text-xs mt-1">Weekly & Monthly Best</p>
+        </a>
+        <a href="playlists.html" class="glass-card p-5 text-center group slide-in">
+          <div class="w-12 h-12 rounded-xl bg-cyan-500/15 mx-auto mb-3 flex items-center justify-center">
+            <i class="fas fa-list text-cyan-400 text-lg"></i>
+          </div>
+          <h3 class="font-bold text-sm">Playlists</h3>
+          <p class="text-white/30 text-xs mt-1">Curated Collections</p>
+        </a>
+        <a href="contests.html" class="glass-card p-5 text-center group slide-in">
+          <div class="w-12 h-12 rounded-xl bg-rose-500/15 mx-auto mb-3 flex items-center justify-center">
+            <i class="fas fa-medal text-rose-400 text-lg"></i>
+          </div>
+          <h3 class="font-bold text-sm">Contests</h3>
+          <p class="text-white/30 text-xs mt-1">Weekly Competitions</p>
+        </a>
+        <a href="search.html?view=categories" class="glass-card p-5 text-center group slide-in">
+          <div class="w-12 h-12 rounded-xl bg-green-500/15 mx-auto mb-3 flex items-center justify-center">
+            <i class="fas fa-layer-group text-green-400 text-lg"></i>
+          </div>
+          <h3 class="font-bold text-sm">Categories</h3>
+          <p class="text-white/30 text-xs mt-1">Browse by Mechanic</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer py-12 mt-12">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="flex items-center gap-3">
+          <img src="logo.png" alt="RL Central" class="w-8 h-8 rounded-lg object-cover">
+          <span class="font-bold text-white/60">RL Central</span>
+        </div>
+        <div class="flex flex-wrap items-center justify-center gap-4 text-sm text-white/30">
+          <a href="Home.html" class="hover:text-white/60 transition-colors">Home</a>
+          <a href="trending.html" class="hover:text-white/60 transition-colors">Trending</a>
+          <a href="leaderboards.html" class="hover:text-white/60 transition-colors">Leaderboards</a>
+          <a href="upload.html" class="hover:text-white/60 transition-colors">Upload</a>
+          <a href="search.html" class="hover:text-white/60 transition-colors">Search</a>
+          <a href="highlights.html" class="hover:text-white/60 transition-colors">Highlights</a>
+          <a href="playlists.html" class="hover:text-white/60 transition-colors">Playlists</a>
+          <a href="contests.html" class="hover:text-white/60 transition-colors">Contests</a>
+        </div>
+        <p class="text-xs text-white/20">&copy; 2026 Rocket League Central</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Mobile Bottom Nav -->
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 glass border-t border-white/[0.08] pb-safe">
+    <div class="flex items-center justify-around py-2">
+      <a href="Home.html" class="flex flex-col items-center gap-0.5 px-3 py-1 text-indigo-400">
+        <i class="fas fa-home text-lg"></i>
+        <span class="text-[10px]">Home</span>
+      </a>
+      <a href="trending.html" class="flex flex-col items-center gap-0.5 px-3 py-1 text-white/50">
+        <i class="fas fa-fire text-lg"></i>
+        <span class="text-[10px]">Trending</span>
+      </a>
+      <a href="upload.html" class="flex flex-col items-center gap-0.5 px-3 py-1">
+        <div class="w-10 h-10 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center -mt-4 shadow-lg shadow-indigo-500/30">
+          <i class="fas fa-plus text-white"></i>
+        </div>
+        <span class="text-[10px] text-white/50">Upload</span>
+      </a>
+      <a href="search.html" class="flex flex-col items-center gap-0.5 px-3 py-1 text-white/50">
+        <i class="fas fa-search text-lg"></i>
+        <span class="text-[10px]">Search</span>
+      </a>
+      <a href="dashboard.html" class="flex flex-col items-center gap-0.5 px-3 py-1 text-white/50">
+        <i class="fas fa-user text-lg"></i>
+        <span class="text-[10px]">Profile</span>
+      </a>
+    </div>
+  </nav>
+
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    // Load featured clip
+    async function loadFeatured() {
+      try {
+        const res = await fetch(API_BASE + '/clips/featured');
+        const clip = await res.json();
+        if (clip && clip._id) {
+          document.getElementById('featuredSection').classList.remove('hidden');
+          document.getElementById('featuredClip').innerHTML = `
+            <a href="watch.html?id=${clip._id}" class="glass-card rounded-3xl overflow-hidden block group">
+              <div class="relative aspect-video">
+                <img src="${clip.thumbnailPath}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="${clip.title}">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div class="w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                    <i class="fas fa-play text-white text-2xl ml-1"></i>
+                  </div>
+                </div>
+                <div class="absolute bottom-6 left-6 right-6">
+                  <div class="flex items-center gap-3 mb-3">
+                    <img src="${clip.user.avatar}" class="w-10 h-10 rounded-full ring-2 ring-white/20">
+                    <span class="font-semibold text-white/80">${clip.user.username}</span>
+                  </div>
+                  <h3 class="text-2xl font-bold text-white mb-2">${clip.title}</h3>
+                  <div class="flex items-center gap-4 text-sm text-white/60">
+                    <span><i class="fas fa-eye mr-1"></i>${clip.views.toLocaleString()} views</span>
+                    <span><i class="fas fa-heart mr-1"></i>${clip.likes} likes</span>
+                  </div>
+                </div>
+              </div>
+            </a>`;
+        }
+      } catch (e) { /* no featured clip */ }
+    }
+    document.addEventListener('DOMContentLoaded', loadFeatured);
+  </script>
+  <script src="js/leaderboard-bar.js"></script>
+  <script src="js/settings.js"></script>
+</body>

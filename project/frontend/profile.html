@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile - Rocket League Central</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="css/tailwind.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Nunito:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-[#07080f] min-h-screen text-white overflow-x-hidden" style="font-family:'Inter',system-ui,sans-serif">
+
+  <!-- Background orbs -->
+  <div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+    <div class="orb orb-pink w-[400px] h-[400px] -top-32 right-1/4 animate-drift"></div>
+    <div class="orb orb-purple w-[300px] h-[300px] bottom-0 left-0 animate-drift" style="animation-delay:-12s"></div>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="fixed top-0 w-full z-50 backdrop-blur-md bg-black/40 border-b border-white/[0.06] transition-all duration-500">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <a href="Home.html" class="flex items-center gap-3 group">
+        <img src="logo.png" alt="RL Central" class="w-10 h-10 rounded-xl shadow-lg shadow-indigo-500/20 group-hover:shadow-indigo-500/40 transition-shadow object-cover">
+        <span class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">RL Central</span>
+      </a>
+      <div class="flex items-center gap-3">
+        <a href="Home.html" class="btn-secondary !py-2 !px-5 text-sm flex items-center gap-2">
+          <i class="fas fa-home"></i> Home
+        </a>
+        <a href="dashboard.html" class="btn-secondary !py-2 !px-5 text-sm flex items-center gap-2">
+          <i class="fas fa-th-large"></i> Dashboard
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="pt-28 pb-16 max-w-5xl mx-auto px-6">
+    <!-- Profile Header -->
+    <div class="glass-card rounded-3xl p-10 text-center mb-10 relative overflow-hidden slide-in">
+      <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500"></div>
+      
+      <!-- Avatar -->
+      <div class="relative inline-block mb-6">
+        <img id="profileAvatar" class="w-28 h-28 rounded-full ring-4 ring-indigo-500/20 shadow-xl shadow-indigo-500/10" src="">
+        <div class="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center border-4 border-[#07080f]">
+          <i class="fas fa-check text-xs"></i>
+        </div>
+      </div>
+
+      <h1 id="profileName" class="text-3xl font-black tracking-tight mb-1"></h1>
+      <p id="profileDisplayName" class="text-white/50 text-sm mb-2"></p>
+      <p id="profileBio" class="text-white/40 text-lg mb-4">Rocket League enthusiast</p>
+      <div id="profileBadges" class="flex flex-wrap justify-center gap-2 mb-6"></div>
+
+      <!-- Follow / Edit button -->
+      <div class="flex justify-center gap-3 mb-8">
+        <button id="followBtn" class="btn-primary !py-2.5 !px-8 text-sm !rounded-xl hidden">
+          <i class="fas fa-user-plus mr-2"></i><span id="followText">Follow</span>
+        </button>
+        <button id="editProfileBtn" class="btn-secondary !py-2.5 !px-6 text-sm !rounded-xl hidden" onclick="openEditModal()">
+          <i class="fas fa-pen mr-2"></i>Edit Profile
+        </button>
+      </div>
+      
+      <!-- Stats row -->
+      <div class="grid grid-cols-5 gap-4 max-w-2xl mx-auto">
+        <div class="glass rounded-2xl p-5">
+          <div id="profileClips" class="text-2xl font-black text-indigo-400 mb-1">0</div>
+          <div class="text-xs font-medium uppercase tracking-widest text-white/30">Clips</div>
+        </div>
+        <div class="glass rounded-2xl p-5">
+          <div id="profileViews" class="text-2xl font-black text-emerald-400 mb-1">0</div>
+          <div class="text-xs font-medium uppercase tracking-widest text-white/30">Views</div>
+        </div>
+        <div class="glass rounded-2xl p-5">
+          <div id="profileLikes" class="text-2xl font-black text-pink-400 mb-1">0</div>
+          <div class="text-xs font-medium uppercase tracking-widest text-white/30">Likes</div>
+        </div>
+        <div class="glass rounded-2xl p-5">
+          <div id="profileFollowers" class="text-2xl font-black text-blue-400 mb-1">0</div>
+          <div class="text-xs font-medium uppercase tracking-widest text-white/30">Followers</div>
+        </div>
+        <div class="glass rounded-2xl p-5">
+          <div id="profileXpRank" class="text-2xl font-black text-yellow-400 mb-1">--</div>
+          <div class="text-xs font-medium uppercase tracking-widest text-white/30">XP Rank</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div id="editModal" class="fixed inset-0 z-[999] hidden items-center justify-center bg-black/60 backdrop-blur-sm">
+      <div class="glass-card rounded-3xl p-8 max-w-md w-full mx-4">
+        <h2 class="text-xl font-bold mb-6 flex items-center gap-2"><i class="fas fa-user-edit text-indigo-400"></i> Profile Settings</h2>
+        <form id="editForm" class="space-y-5">
+          <!-- Avatar upload -->
+          <div class="flex flex-col items-center gap-3">
+            <div class="relative group cursor-pointer" onclick="document.getElementById('avatarInput').click()">
+              <img id="editAvatarPreview" class="w-24 h-24 rounded-full ring-4 ring-indigo-500/20 object-cover" src="">
+              <div class="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <i class="fas fa-camera text-white text-lg"></i>
+              </div>
+            </div>
+            <input type="file" id="avatarInput" accept="image/png,image/jpeg,image/webp,image/gif" class="hidden">
+            <p class="text-xs text-white/30">Click to change avatar (max 2MB)</p>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold mb-1 text-white/70">Display Name</label>
+            <input type="text" id="editDisplayName" class="input-field !rounded-xl !text-sm" maxlength="50">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold mb-1 text-white/70">Bio</label>
+            <textarea id="editBio" rows="3" class="input-field !rounded-xl !text-sm resize-none" maxlength="300" placeholder="Tell people about yourself..."></textarea>
+          </div>
+          <p id="editError" class="text-red-400 text-xs text-center hidden"></p>
+          <div class="flex gap-3 pt-2">
+            <button type="submit" class="btn-primary flex-1 !py-3 !rounded-xl text-sm">Save Changes</button>
+            <button type="button" class="btn-secondary flex-1 !py-3 !rounded-xl text-sm" onclick="closeEditModal()">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Clips Grid -->
+    <div class="glass-card rounded-3xl p-8 slide-in" style="animation-delay:0.15s">
+      <div class="flex items-center justify-between mb-8">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-indigo-500/15 flex items-center justify-center">
+            <i class="fas fa-film text-indigo-400"></i>
+          </div>
+          <h2 class="text-2xl font-bold tracking-tight">Latest Clips</h2>
+        </div>
+      </div>
+      <div id="profileClipsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 stagger"></div>
+    </div>
+
+    <!-- Achievements -->
+    <div class="glass-card rounded-3xl p-8 mt-8 slide-in" style="animation-delay:0.2s">
+      <div class="flex items-center gap-3 mb-8">
+        <div class="w-10 h-10 rounded-xl bg-yellow-500/15 flex items-center justify-center">
+          <i class="fas fa-trophy text-yellow-400"></i>
+        </div>
+        <h2 class="text-2xl font-bold tracking-tight">Achievements</h2>
+      </div>
+      <div id="profileAchievements" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+        <p class="text-white/30 text-sm italic col-span-full">Loading...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer py-10 mt-8">
+    <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <img src="logo.png" alt="RL Central" class="w-8 h-8 rounded-lg object-cover">
+        <span class="font-bold text-white/40">RL Central</span>
+      </div>
+      <div class="flex flex-wrap items-center justify-center gap-4 text-sm text-white/30">
+        <a href="Home.html" class="hover:text-white/60 transition-colors">Home</a>
+        <a href="highlights.html" class="hover:text-white/60 transition-colors">Highlights</a>
+        <a href="contests.html" class="hover:text-white/60 transition-colors">Contests</a>
+      </div>
+      <p class="text-xs text-white/20">&copy; 2026 Rocket League Central</p>
+    </div>
+  </footer>
+
+  <!-- Mobile Bottom Nav -->
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 glass border-t border-white/[0.08] pb-safe">
+    <div class="flex items-center justify-around py-2">
+      <a href="Home.html" class="flex flex-col items-center gap-0.5 px-3 py-1 text-white/50"><i class="fas fa-home text-lg"></i><span class="text-[10px]">Home</span></a>
+      <a href="trending.html" class="flex flex-col items-center gap-0.5 px-3 py-1 text-white/50"><i class="fas fa-fire text-lg"></i><span class="text-[10px]">Trending</span></a>
+      <a href="upload.html" class="flex flex-col items-center gap-0.5 px-3 py-1"><div class="w-10 h-10 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center -mt-4 shadow-lg shadow-indigo-500/30"><i class="fas fa-plus text-white"></i></div><span class="text-[10px] text-white/50">Upload</span></a>
+      <a href="search.html" class="flex flex-col items-center gap-0.5 px-3 py-1 text-white/50"><i class="fas fa-search text-lg"></i><span class="text-[10px]">Search</span></a>
+      <a href="dashboard.html" class="flex flex-col items-center gap-0.5 px-3 py-1 text-white/50"><i class="fas fa-user text-lg"></i><span class="text-[10px]">Profile</span></a>
+    </div>
+  </nav>
+
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const userId = urlParams.get('id');
+    let profileUser = null;
+    
+    async function loadProfile() {
+      try {
+        const currentUser = await checkAuth();
+        const endpoint = (!userId || (currentUser && userId === currentUser._id))
+          ? '/api/users/me' : `/api/users/${userId}`;
+        const res = await fetch(`${endpoint}`, { credentials: 'include' });
+        const user = await res.json();
+        profileUser = user;
+        
+        document.getElementById('profileAvatar').src = user.avatar;
+        document.getElementById('profileName').textContent = user.username;
+        document.getElementById('profileDisplayName').textContent = user.displayName || '';
+        document.getElementById('profileBio').textContent = user.bio || 'Rocket League enthusiast';
+        document.getElementById('profileBadges').innerHTML = renderBadges(user);
+        document.getElementById('profileFollowers').textContent = (user.followers || []).length;
+        
+        const clips = user.clips || [];
+        document.getElementById('profileClips').textContent = clips.length;
+        let totalViews = 0, totalLikes = 0;
+        clips.forEach(clip => {
+          totalViews += clip.views;
+          totalLikes += clip.likes;
+        });
+        document.getElementById('profileViews').textContent = totalViews.toLocaleString();
+        document.getElementById('profileLikes').textContent = totalLikes.toLocaleString();
+        
+        // Load XP rank
+        const targetId = userId || (currentUser ? currentUser._id : null);
+        if (targetId) {
+          try {
+            const xpRes = await fetch(`/api/users/${targetId}/xp-rank`);
+            const xpData = await xpRes.json();
+            document.getElementById('profileXpRank').textContent = xpData.rank || '--';
+          } catch(e) {}
+          try {
+            const achRes = await fetch(`/api/users/${targetId}/achievements`);
+            const achievements = await achRes.json();
+            const achContainer = document.getElementById('profileAchievements');
+            const unlocked = achievements.filter(a => a.unlockedAt);
+            if (unlocked.length) {
+              achContainer.innerHTML = unlocked.map(a => `
+                <div class="glass rounded-xl p-3 text-center">
+                  <div class="text-2xl mb-1">${a.icon || '🏆'}</div>
+                  <h4 class="text-xs font-bold">${a.name}</h4>
+                </div>
+              `).join('');
+            } else {
+              achContainer.innerHTML = '<p class="text-white/30 text-sm italic col-span-full">No achievements yet</p>';
+            }
+          } catch(e) {}
+        }
+        
+        // Show follow or edit button
+        if (currentUser) {
+          if (userId && userId !== currentUser._id) {
+            document.getElementById('followBtn').classList.remove('hidden');
+            const isFollowing = (user.followers || []).includes(currentUser._id);
+            document.getElementById('followText').textContent = isFollowing ? 'Unfollow' : 'Follow';
+          } else {
+            document.getElementById('editProfileBtn').classList.remove('hidden');
+            document.getElementById('editDisplayName').value = user.displayName || '';
+            document.getElementById('editBio').value = user.bio || '';
+          }
+        }
+        
+        document.getElementById('profileClipsGrid').innerHTML = clips.slice(0, 8).map(clip => `
+          <a href="watch.html?id=${clip._id}" class="group slide-in">
+            <div class="relative rounded-xl overflow-hidden img-shine mb-3">
+              <img src="${clip.thumbnailPath}" class="w-full aspect-video object-cover group-hover:scale-105 transition-transform duration-500" alt="${clip.title}" loading="lazy">
+              <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+              <div class="absolute bottom-2 left-2 flex gap-1">
+                <span class="glass !bg-black/50 px-2 py-0.5 rounded-full text-xs flex items-center gap-1"><i class="fas fa-eye text-emerald-400" style="font-size:10px"></i> ${clip.views}</span>
+                <span class="glass !bg-black/50 px-2 py-0.5 rounded-full text-xs flex items-center gap-1"><i class="fas fa-heart text-pink-400" style="font-size:10px"></i> ${clip.likes}</span>
+              </div>
+            </div>
+            <p class="font-semibold text-sm line-clamp-1 group-hover:text-indigo-300 transition-colors">${clip.title}</p>
+          </a>
+        `).join('') || '<p class="text-white/30 text-sm col-span-full text-center py-8">No clips uploaded yet</p>';
+        
+      } catch (err) {
+        console.error('Error loading profile:', err);
+      }
+    }
+
+    // Follow
+    document.getElementById('followBtn').addEventListener('click', async () => {
+      if (!profileUser) return;
+      try {
+        const res = await fetch(`/api/users/${userId}/follow`, {
+          method: 'POST',
+          credentials: 'include'
+        });
+        if (res.ok) {
+          const data = await res.json();
+          document.getElementById('followText').textContent = data.following ? 'Unfollow' : 'Follow';
+          document.getElementById('profileFollowers').textContent = data.followers;
+        }
+      } catch (err) { alert('Login required'); }
+    });
+
+    // Edit profile modal
+    function openEditModal() {
+      document.getElementById('editAvatarPreview').src = profileUser?.avatar || '';
+      document.getElementById('editModal').classList.remove('hidden');
+      document.getElementById('editModal').classList.add('flex');
+    }
+    function closeEditModal() {
+      document.getElementById('editModal').classList.add('hidden');
+      document.getElementById('editModal').classList.remove('flex');
+    }
+
+    document.getElementById('editForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const errEl = document.getElementById('editError');
+      errEl.classList.add('hidden');
+      try {
+        // Upload avatar first if selected
+        const avatarFile = document.getElementById('avatarInput').files[0];
+        if (avatarFile) {
+          if (avatarFile.size > 2 * 1024 * 1024) {
+            errEl.textContent = 'Avatar must be under 2MB';
+            errEl.classList.remove('hidden');
+            return;
+          }
+          const formData = new FormData();
+          formData.append('avatar', avatarFile);
+          const avatarRes = await fetch('/api/users/avatar', {
+            method: 'POST', credentials: 'include', body: formData
+          });
+          if (!avatarRes.ok) {
+            const d = await avatarRes.json().catch(() => ({}));
+            errEl.textContent = d.error || 'Failed to upload avatar';
+            errEl.classList.remove('hidden');
+            return;
+          }
+        }
+
+        const res = await fetch('/api/users/profile', {
+          method: 'PUT',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            displayName: document.getElementById('editDisplayName').value,
+            bio: document.getElementById('editBio').value
+          })
+        });
+        if (res.ok) {
+          closeEditModal();
+          loadProfile();
+        } else {
+          const d = await res.json().catch(() => ({}));
+          errEl.textContent = d.error || 'Failed to update profile';
+          errEl.classList.remove('hidden');
+        }
+      } catch (err) { 
+        const errEl2 = document.getElementById('editError');
+        errEl2.textContent = 'Failed to update profile';
+        errEl2.classList.remove('hidden');
+      }
+    });
+
+    // Avatar preview
+    document.getElementById('avatarInput').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (ev) => { document.getElementById('editAvatarPreview').src = ev.target.result; };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Auto-open settings if ?settings=1
+    document.addEventListener('DOMContentLoaded', async () => {
+      await loadProfile();
+      if (urlParams.get('settings') === '1' && window.currentUser) {
+        openEditModal();
+      }
+    });
+  </script>
+  <script src="js/leaderboard-bar.js"></script>
+  <script src="js/settings.js"></script>
+</body>

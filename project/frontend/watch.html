@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="pageTitle">Watch Clip - Rocket League Central</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="css/tailwind.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Nunito:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-[#07080f] min-h-screen text-white overflow-x-hidden" style="font-family:'Inter',system-ui,sans-serif">
+
+  <!-- Background orbs -->
+  <div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+    <div class="orb orb-blue w-[400px] h-[400px] -top-40 right-0 animate-drift"></div>
+    <div class="orb orb-purple w-[300px] h-[300px] bottom-0 -left-20 animate-drift" style="animation-delay:-8s"></div>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="fixed top-0 w-full z-50 backdrop-blur-md bg-black/40 border-b border-white/[0.06] transition-all duration-500">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <a href="Home.html" class="flex items-center gap-3 group">
+        <img src="logo.png" alt="RL Central" class="w-10 h-10 rounded-xl shadow-lg shadow-indigo-500/20 group-hover:shadow-indigo-500/40 transition-shadow object-cover">
+        <span class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">RL Central</span>
+      </a>
+      <div class="flex items-center gap-3">
+        <a href="upload.html" class="btn-primary !py-2 !px-5 text-sm flex items-center gap-2">
+          <i class="fas fa-plus"></i><span class="hidden sm:inline">Upload</span>
+        </a>
+        <div id="userMenu" style="display:none" class="relative flex items-center gap-2 glass rounded-full px-3 py-1.5 cursor-pointer" onclick="toggleProfileDropdown(event)">
+          <img id="userAvatar" class="w-8 h-8 rounded-full ring-2 ring-indigo-500/30" src="">
+          <span id="username" class="font-medium text-sm hidden sm:block"></span>
+          <i class="fas fa-chevron-down text-xs text-white/40 ml-1"></i>
+          <div id="profileDropdown" class="hidden absolute top-full right-0 mt-2 w-52 glass-card rounded-2xl py-2 shadow-2xl z-[100] border border-white/[0.08]">
+            <a href="profile.html" class="flex items-center gap-3 px-4 py-2.5 text-sm text-white/70 hover:text-white hover:bg-white/[0.06] transition-colors"><i class="fas fa-user text-indigo-400 w-5 text-center"></i> Profile</a>
+            <a href="profile.html?settings=1" class="flex items-center gap-3 px-4 py-2.5 text-sm text-white/70 hover:text-white hover:bg-white/[0.06] transition-colors"><i class="fas fa-cog text-purple-400 w-5 text-center"></i> Profile Settings</a>
+            <a href="dashboard.html" class="flex items-center gap-3 px-4 py-2.5 text-sm text-white/70 hover:text-white hover:bg-white/[0.06] transition-colors"><i class="fas fa-th-large text-cyan-400 w-5 text-center"></i> Dashboard</a>
+            <div class="border-t border-white/[0.06] my-1"></div>
+            <a href="/auth/logout" class="flex items-center gap-3 px-4 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-white/[0.06] transition-colors"><i class="fas fa-sign-out-alt w-5 text-center"></i> Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="max-w-6xl mx-auto px-6 pt-28 pb-16">
+    <!-- Video Player -->
+    <div class="glass-card rounded-3xl p-4 mb-8 slide-in overflow-hidden relative" id="playerContainer">
+      <video id="mainVideo" controls class="w-full rounded-2xl max-h-[70vh] object-contain bg-black/50" poster="">
+        Your browser does not support the video tag.
+      </video>
+      <!-- Video controls overlay -->
+      <div class="flex items-center gap-3 mt-3 px-2">
+        <button id="theaterBtn" class="btn-secondary !py-1.5 !px-3 text-xs !rounded-lg" title="Theater mode">
+          <i class="fas fa-expand"></i> Theater
+        </button>
+        <div class="flex items-center gap-2 text-xs text-white/40">
+          <label for="playbackSpeed">Speed:</label>
+          <select id="playbackSpeed" class="input-field !py-1 !px-2 !text-xs !rounded-lg !w-auto">
+            <option value="0.25">0.25x</option>
+            <option value="0.5">0.5x</option>
+            <option value="0.75">0.75x</option>
+            <option value="1" selected>1x</option>
+            <option value="1.25">1.25x</option>
+            <option value="1.5">1.5x</option>
+            <option value="2">2x</option>
+          </select>
+        </div>
+        <div class="text-xs text-white/20 ml-auto">
+          Shortcuts: Space (play/pause) &middot; F (fullscreen) &middot; &larr;&rarr; (seek)
+        </div>
+      </div>
+    </div>
+
+    <!-- Video Info -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Left: Info panel -->
+      <div class="lg:col-span-1 space-y-6 slide-in" style="animation-delay:0.1s">
+        <!-- Uploader -->
+        <div class="glass-card rounded-2xl p-6">
+          <div class="flex items-center gap-4 mb-5">
+            <a href="#" id="uploaderLink">
+              <img id="uploaderAvatar" class="w-14 h-14 rounded-full ring-2 ring-indigo-500/20">
+            </a>
+            <div class="flex-1 min-w-0">
+              <h2 id="videoTitle" class="text-xl font-bold tracking-tight line-clamp-2"></h2>
+              <a href="#" id="uploaderNameLink" class="text-white/40 text-sm mt-0.5 hover:text-indigo-300 transition-colors">
+                <span id="uploaderName"></span>
+              </a>
+            </div>
+          </div>
+          <div id="uploaderBadges" class="flex flex-wrap gap-1 mb-3"></div>
+          <div class="divider my-4"></div>
+          <div class="flex items-center gap-5 text-sm text-white/40">
+            <span id="viewCount" class="flex items-center gap-1.5"><i class="fas fa-eye text-emerald-400"></i> 0 views</span>
+            <span id="likeCount" class="flex items-center gap-1.5"><i class="fas fa-heart text-pink-400"></i> 0 likes</span>
+          </div>
+          <div id="clipTags" class="flex flex-wrap gap-1 mt-3"></div>
+          <p id="uploadDate" class="text-xs text-white/25 mt-3"></p>
+        </div>
+
+        <!-- Action buttons -->
+        <div class="space-y-3">
+          <button id="likeBtn" class="w-full btn-primary !rounded-2xl !py-4 flex items-center justify-center gap-2.5 text-lg group">
+            <i class="fas fa-heart group-hover:scale-110 transition-transform"></i>
+            <span id="likeText">Like this clip</span>
+          </button>
+          <button id="bookmarkBtn" class="w-full btn-secondary !rounded-2xl !py-3 flex items-center justify-center gap-2 text-sm">
+            <i class="fas fa-bookmark"></i>
+            <span id="bookmarkText">Bookmark</span>
+          </button>
+          <button id="followBtn" class="w-full btn-secondary !rounded-2xl !py-3 flex items-center justify-center gap-2 text-sm hidden">
+            <i class="fas fa-user-plus"></i>
+            <span id="followText">Follow</span>
+          </button>
+          <div class="grid grid-cols-2 gap-2">
+            <a id="downloadBtn" href="#" download class="btn-secondary !rounded-2xl !py-2.5 flex items-center justify-center gap-2 text-xs">
+              <i class="fas fa-download"></i> Download
+            </a>
+            <button id="embedBtn" class="btn-secondary !rounded-2xl !py-2.5 flex items-center justify-center gap-2 text-xs">
+              <i class="fas fa-code"></i> Embed
+            </button>
+          </div>
+          <!-- Embed Code Panel -->
+          <div id="embedPanel" class="hidden glass-card rounded-xl p-4">
+            <label class="text-xs text-white/30 font-semibold uppercase tracking-widest mb-2 block">Embed Code</label>
+            <textarea id="embedCode" rows="3" readonly class="input-field !text-xs !rounded-lg font-mono resize-none"></textarea>
+            <button id="copyEmbedBtn" class="btn-primary !py-1.5 !px-3 text-xs !rounded-lg mt-2 w-full">
+              <i class="fas fa-copy mr-1"></i> Copy Embed Code
+            </button>
+          </div>
+        </div>
+
+        <!-- Share buttons -->
+        <div class="glass-card rounded-2xl p-5">
+          <h3 class="text-sm font-semibold uppercase tracking-widest text-white/30 mb-3">Share</h3>
+          <div class="grid grid-cols-4 gap-2">
+            <button onclick="copyClipLink()" class="btn-secondary !rounded-xl !py-2.5 text-xs flex flex-col items-center gap-1" title="Copy link">
+              <i class="fas fa-link text-indigo-400"></i>
+              <span class="text-[10px]">Copy</span>
+            </button>
+            <a id="shareTwitter" href="#" target="_blank" class="btn-secondary !rounded-xl !py-2.5 text-xs flex flex-col items-center gap-1" title="Share on Twitter">
+              <i class="fab fa-twitter text-sky-400"></i>
+              <span class="text-[10px]">Twitter</span>
+            </a>
+            <a id="shareReddit" href="#" target="_blank" class="btn-secondary !rounded-xl !py-2.5 text-xs flex flex-col items-center gap-1" title="Share on Reddit">
+              <i class="fab fa-reddit text-orange-400"></i>
+              <span class="text-[10px]">Reddit</span>
+            </a>
+            <a id="shareDiscord" href="#" onclick="copyClipLink(); return false;" class="btn-secondary !rounded-xl !py-2.5 text-xs flex flex-col items-center gap-1" title="Copy for Discord">
+              <i class="fab fa-discord text-indigo-400"></i>
+              <span class="text-[10px]">Discord</span>
+            </a>
+          </div>
+          <div id="copyMsg" class="text-center text-xs text-green-400 mt-2 hidden">Link copied!</div>
+        </div>
+
+        <!-- Report -->
+        <button id="reportBtn" class="w-full btn-secondary !rounded-2xl !py-2.5 text-xs text-white/30 hover:text-red-400 flex items-center justify-center gap-2">
+          <i class="fas fa-flag"></i> Report this clip
+        </button>
+      </div>
+
+      <!-- Right: Description + Comments + Related -->
+      <div class="lg:col-span-2 space-y-8 slide-in" style="animation-delay:0.2s">
+        <!-- Description -->
+        <div class="glass-card rounded-2xl p-6">
+          <h3 class="text-sm font-semibold uppercase tracking-widest text-white/30 mb-3">Description</h3>
+          <div id="description" class="whitespace-pre-wrap text-white/60 leading-relaxed"></div>
+        </div>
+
+        <!-- Comments -->
+        <div class="glass-card rounded-2xl p-6">
+          <h3 class="text-lg font-bold flex items-center gap-2 mb-6">
+            <i class="fas fa-comments text-indigo-400"></i> Comments
+            <span id="commentCount" class="text-sm font-normal text-white/30"></span>
+          </h3>
+          <!-- Comment form -->
+          <div id="commentForm" class="mb-6 hidden">
+            <div id="replyIndicator" class="hidden mb-2 px-3 py-2 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-xs text-white/50 flex items-center justify-between">
+              <span>Replying to <strong id="replyToName"></strong></span>
+              <button onclick="cancelReply()" class="text-white/30 hover:text-white/60"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="flex gap-3">
+              <img id="commentUserAvatar" class="w-10 h-10 rounded-full ring-1 ring-white/10 flex-shrink-0" src="">
+              <div class="flex-1">
+                <textarea id="commentText" rows="2" placeholder="Add a comment... Use @username to mention" class="input-field !rounded-xl !text-sm resize-none"></textarea>
+                <div class="flex justify-end mt-2">
+                  <button id="commentSubmit" class="btn-primary !py-2 !px-5 text-sm !rounded-xl">
+                    <i class="fas fa-paper-plane mr-1.5"></i>Comment
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="commentLoginMsg" class="text-center text-white/30 text-sm mb-4 hidden">
+            <a href="login.html" class="text-indigo-400 hover:text-indigo-300">Log in</a> to comment
+          </div>
+          <div id="commentsList" class="space-y-4"></div>
+        </div>
+
+        <!-- Related Clips -->
+        <div class="glass-card rounded-2xl p-6">
+          <h3 class="text-lg font-bold flex items-center gap-2 mb-6">
+            <i class="fas fa-film text-purple-400"></i> Related Clips
+          </h3>
+          <div id="relatedClips" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer py-10 mt-8">
+    <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <img src="logo.png" alt="RL Central" class="w-8 h-8 rounded-lg object-cover">
+        <span class="font-bold text-white/40">RL Central</span>
+      </div>
+      <div class="flex flex-wrap items-center justify-center gap-4 text-sm text-white/30">
+        <a href="Home.html" class="hover:text-white/60 transition-colors">Home</a>
+        <a href="trending.html" class="hover:text-white/60 transition-colors">Trending</a>
+        <a href="highlights.html" class="hover:text-white/60 transition-colors">Highlights</a>
+        <a href="playlists.html" class="hover:text-white/60 transition-colors">Playlists</a>
+        <a href="contests.html" class="hover:text-white/60 transition-colors">Contests</a>
+      </div>
+      <p class="text-xs text-white/20">&copy; 2026 Rocket League Central</p>
+    </div>
+  </footer>
+
+  <!-- Mobile Bottom Nav -->
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 glass border-t border-white/[0.08] pb-safe">
+    <div class="flex items-center justify-around py-2">
+      <a href="Home.html" class="flex flex-col items-center gap-0.5 px-3 py-1 text-white/50">
+        <i class="fas fa-home text-lg"></i><span class="text-[10px]">Home</span>
+      </a>
+      <a href="trending.html" class="flex flex-col items-center gap-0.5 px-3 py-1 text-white/50">
+        <i class="fas fa-fire text-lg"></i><span class="text-[10px]">Trending</span>
+      </a>
+      <a href="upload.html" class="flex flex-col items-center gap-0.5 px-3 py-1">
+        <div class="w-10 h-10 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center -mt-4 shadow-lg shadow-indigo-500/30">
+          <i class="fas fa-plus text-white"></i>
+        </div>
+        <span class="text-[10px] text-white/50">Upload</span>
+      </a>
+      <a href="search.html" class="flex flex-col items-center gap-0.5 px-3 py-1 text-white/50">
+        <i class="fas fa-search text-lg"></i><span class="text-[10px]">Search</span>
+      </a>
+      <a href="dashboard.html" class="flex flex-col items-center gap-0.5 px-3 py-1 text-white/50">
+        <i class="fas fa-user text-lg"></i><span class="text-[10px]">Profile</span>
+      </a>
+    </div>
+  </nav>
+
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const clipId = urlParams.get('id');
+    let clipData = null;
+    let replyingTo = null;
+
+    async function loadClipPage() {
+      try {
+        const res = await fetch(`/api/clips/${clipId}`);
+        const clip = await res.json();
+        clipData = clip;
+
+        document.getElementById('pageTitle').textContent = clip.title + ' - RL Central';
+        document.getElementById('mainVideo').src = clip.videoPath;
+        document.getElementById('mainVideo').poster = clip.thumbnailPath;
+        document.getElementById('videoTitle').textContent = clip.title;
+        document.getElementById('uploaderAvatar').src = clip.user.avatar;
+        document.getElementById('uploaderName').textContent = clip.user.username;
+        document.getElementById('uploaderLink').href = `profile.html?id=${clip.user._id}`;
+        document.getElementById('uploaderNameLink').href = `profile.html?id=${clip.user._id}`;
+        document.getElementById('description').textContent = clip.description || 'No description provided.';
+        document.getElementById('viewCount').innerHTML = `<i class="fas fa-eye text-emerald-400 mr-1"></i>${clip.views.toLocaleString()} views`;
+        document.getElementById('likeCount').innerHTML = `<i class="fas fa-heart text-pink-400 mr-1"></i>${clip.likes} likes`;
+        document.getElementById('uploadDate').textContent = new Date(clip.createdAt).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+        // Category & Rank badges
+        const badgesEl = document.getElementById('uploaderBadges');
+        let badgeHtml = '';
+        if (clip.category) badgeHtml += `<span class="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300">${clip.category}</span>`;
+        if (clip.rlRank) badgeHtml += `<span class="text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300">${clip.rlRank}</span>`;
+        badgesEl.innerHTML = badgeHtml;
+
+        // Tags
+        if (clip.tags && clip.tags.length) {
+          document.getElementById('clipTags').innerHTML = clip.tags.map(t =>
+            `<a href="search.html?tag=${encodeURIComponent(t)}" class="text-xs px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500/30 transition-colors">#${t}</a>`
+          ).join('');
+        }
+
+        // Download
+        document.getElementById('downloadBtn').href = `/api/clips/${clipId}/download`;
+
+        // Embed
+        const embedCode = `<iframe src="${window.location.origin}/embed/${clipId}" width="640" height="360" frameborder="0" allowfullscreen></iframe>`;
+        document.getElementById('embedCode').value = embedCode;
+
+        // Share links
+        const pageUrl = window.location.href;
+        document.getElementById('shareTwitter').href = `https://twitter.com/intent/tweet?text=${encodeURIComponent(clip.title + ' - Check out this clip!')}&url=${encodeURIComponent(pageUrl)}`;
+        document.getElementById('shareReddit').href = `https://reddit.com/submit?url=${encodeURIComponent(pageUrl)}&title=${encodeURIComponent(clip.title)}`;
+
+        // Comments - render threaded
+        renderComments(clip.comments || []);
+
+        // Check auth for comment form and follow button
+        const user = await checkAuth();
+        if (user) {
+          document.getElementById('commentForm').classList.remove('hidden');
+          document.getElementById('commentUserAvatar').src = user.avatar;
+          // Check like state
+          if (clip.likedBy && clip.likedBy.includes(user._id)) {
+            document.getElementById('likeText').textContent = 'Unlike';
+            document.getElementById('likeBtn').classList.add('!bg-pink-500/20');
+          }
+          // Check bookmark state
+          try {
+            const bkRes = await fetch('/api/clips/bookmarks', { credentials: 'include' });
+            const bookmarks = await bkRes.json();
+            if (Array.isArray(bookmarks) && bookmarks.some(b => (b.clip?._id || b.clip) === clipId)) {
+              document.getElementById('bookmarkText').textContent = 'Bookmarked';
+              document.getElementById('bookmarkBtn').classList.add('!bg-yellow-500/20', '!text-yellow-300');
+            }
+          } catch(e) {}
+          // Follow button
+          if (clip.user._id !== user._id) {
+            document.getElementById('followBtn').classList.remove('hidden');
+            const profileRes = await fetch(`/api/users/${clip.user._id}`);
+            const profileData = await profileRes.json();
+            if (profileData.followers && profileData.followers.includes(user._id)) {
+              document.getElementById('followText').textContent = 'Unfollow';
+            }
+          }
+        } else {
+          document.getElementById('commentLoginMsg').classList.remove('hidden');
+        }
+
+        // Load related clips
+        loadRelated();
+      } catch (err) {
+        console.error('Error loading clip:', err);
+      }
+    }
+
+    function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
+    function highlightMentions(text) {
+      const safe = escHtml(text);
+      return safe.replace(/@(\w+)/g, '<span class="text-indigo-400 font-semibold cursor-pointer hover:underline" onclick="window.location.href=\'search.html?q=$1\'">@$1</span>');
+    }
+
+    function renderComments(comments) {
+      const topLevel = comments.filter(c => !c.parentComment);
+      const total = comments.length;
+      document.getElementById('commentCount').textContent = `(${total})`;
+      if (!topLevel.length) {
+        document.getElementById('commentsList').innerHTML = '<p class="text-white/30 italic text-sm">No comments yet. Be the first!</p>';
+        return;
+      }
+      document.getElementById('commentsList').innerHTML = topLevel.map(c => renderCommentThread(c)).join('');
+    }
+
+    function renderCommentThread(c) {
+      const replies = (c.replies || []).map(r => `
+        <div class="glass rounded-lg p-3 flex gap-3 ml-8 mt-2 border-l-2 border-indigo-500/20">
+          <a href="profile.html?id=${r.user?._id || ''}">
+            <img src="${escHtml(r.user?.avatar || '/uploads/avatars/default.png')}" class="w-8 h-8 rounded-full ring-1 ring-white/10 flex-shrink-0">
+          </a>
+          <div class="min-w-0 flex-1">
+            <a href="profile.html?id=${r.user?._id || ''}" class="font-semibold text-xs hover:text-indigo-300 transition-colors">${escHtml(r.user?.username || 'Unknown')}</a>
+            <p class="text-white/60 text-xs mt-1">${highlightMentions(r.text)}</p>
+            <p class="text-[10px] text-white/20 mt-1">${new Date(r.createdAt).toLocaleString()}</p>
+          </div>
+        </div>
+      `).join('');
+
+      return `
+        <div class="glass rounded-xl p-4 flex gap-4">
+          <a href="profile.html?id=${c.user._id}">
+            <img src="${escHtml(c.user.avatar)}" class="w-10 h-10 rounded-full ring-1 ring-white/10 flex-shrink-0">
+          </a>
+          <div class="min-w-0 flex-1">
+            <a href="profile.html?id=${c.user._id}" class="font-semibold text-sm hover:text-indigo-300 transition-colors">${escHtml(c.user.username)}</a>
+            <p class="text-white/60 text-sm mt-1">${highlightMentions(c.text)}</p>
+            <div class="flex items-center gap-3 mt-2">
+              <p class="text-xs text-white/20">${new Date(c.createdAt).toLocaleString()}</p>
+              <button onclick="startReply('${c._id}', '${escHtml(c.user.username)}')" class="text-xs text-white/30 hover:text-indigo-400 transition-colors">
+                <i class="fas fa-reply mr-1"></i>Reply
+              </button>
+            </div>
+            ${replies}
+          </div>
+        </div>
+      `;
+    }
+
+    function startReply(commentId, username) {
+      replyingTo = commentId;
+      document.getElementById('replyIndicator').classList.remove('hidden');
+      document.getElementById('replyToName').textContent = username;
+      document.getElementById('commentText').focus();
+      document.getElementById('commentText').value = `@${username} `;
+    }
+
+    function cancelReply() {
+      replyingTo = null;
+      document.getElementById('replyIndicator').classList.add('hidden');
+      document.getElementById('commentText').value = '';
+    }
+
+    // Submit comment
+    document.getElementById('commentSubmit').addEventListener('click', async () => {
+      const text = document.getElementById('commentText').value.trim();
+      if (!text) return;
+      try {
+        const body = { text };
+        if (replyingTo) body.parentCommentId = replyingTo;
+        const res = await fetch(`/api/clips/${clipId}/comment`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        if (res.ok) {
+          document.getElementById('commentText').value = '';
+          cancelReply();
+          const clipRes = await fetch(`/api/clips/${clipId}`);
+          const updatedClip = await clipRes.json();
+          renderComments(updatedClip.comments || []);
+        } else {
+          const err = await res.json();
+          alert(err.error || 'Failed to post comment');
+        }
+      } catch (err) {
+        alert('Failed to post comment');
+      }
+    });
+
+    // Like
+    document.getElementById('likeBtn').addEventListener('click', async () => {
+      try {
+        const res = await fetch(`/api/clips/${clipId}/like`, {
+          method: 'POST',
+          credentials: 'include'
+        });
+        if (res.ok) {
+          const data = await res.json();
+          document.getElementById('likeCount').innerHTML = `<i class="fas fa-heart text-pink-400 mr-1"></i>${data.likes} likes`;
+          document.getElementById('likeText').textContent = data.liked ? 'Unlike' : 'Like this clip';
+          document.getElementById('likeBtn').classList.toggle('!bg-pink-500/20', data.liked);
+        } else {
+          alert('Login required to like');
+        }
+      } catch (err) {
+        alert('Login required to like');
+      }
+    });
+
+    // Follow
+    document.getElementById('followBtn').addEventListener('click', async () => {
+      if (!clipData) return;
+      try {
+        const res = await fetch(`/api/users/${clipData.user._id}/follow`, {
+          method: 'POST',
+          credentials: 'include'
+        });
+        if (res.ok) {
+          const data = await res.json();
+          document.getElementById('followText').textContent = data.following ? 'Unfollow' : 'Follow';
+        }
+      } catch (err) {
+        alert('Login required to follow');
+      }
+    });
+
+    // Report
+    document.getElementById('reportBtn').addEventListener('click', async () => {
+      const reason = prompt('Why are you reporting this clip?');
+      if (!reason || !reason.trim()) return;
+      try {
+        const res = await fetch(`/api/clips/${clipId}/report`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reason })
+        });
+        if (res.ok) {
+          alert('Report submitted. Thank you!');
+        } else {
+          const data = await res.json();
+          alert(data.error || 'Failed to report');
+        }
+      } catch (err) {
+        alert('Login required to report');
+      }
+    });
+
+    // Bookmark
+    document.getElementById('bookmarkBtn').addEventListener('click', async () => {
+      try {
+        const res = await fetch(`/api/clips/${clipId}/bookmark`, { method: 'POST', credentials: 'include' });
+        if (res.ok) {
+          const data = await res.json();
+          document.getElementById('bookmarkText').textContent = data.bookmarked ? 'Bookmarked' : 'Bookmark';
+          document.getElementById('bookmarkBtn').classList.toggle('!bg-yellow-500/20', data.bookmarked);
+          document.getElementById('bookmarkBtn').classList.toggle('!text-yellow-300', data.bookmarked);
+        } else { alert('Login required to bookmark'); }
+      } catch(e) { alert('Login required to bookmark'); }
+    });
+
+    // Embed toggle
+    document.getElementById('embedBtn').addEventListener('click', () => {
+      document.getElementById('embedPanel').classList.toggle('hidden');
+    });
+    document.getElementById('copyEmbedBtn').addEventListener('click', () => {
+      const el = document.getElementById('embedCode');
+      el.select();
+      navigator.clipboard.writeText(el.value);
+      document.getElementById('copyEmbedBtn').innerHTML = '<i class="fas fa-check mr-1"></i> Copied!';
+      setTimeout(() => { document.getElementById('copyEmbedBtn').innerHTML = '<i class="fas fa-copy mr-1"></i> Copy Embed Code'; }, 2000);
+    });
+
+    // Copy link
+    function copyClipLink() {
+      navigator.clipboard.writeText(window.location.href);
+      const msg = document.getElementById('copyMsg');
+      msg.classList.remove('hidden');
+      setTimeout(() => msg.classList.add('hidden'), 2000);
+    }
+
+    // Related clips
+    async function loadRelated() {
+      try {
+        const res = await fetch(`/api/clips/${clipId}/related`);
+        const clips = await res.json();
+        const container = document.getElementById('relatedClips');
+        if (!clips.length) {
+          container.innerHTML = '<p class="text-white/30 text-sm col-span-full">No related clips found</p>';
+          return;
+        }
+        container.innerHTML = clips.map(c => `
+          <a href="watch.html?id=${c._id}" class="glass rounded-xl overflow-hidden group flex gap-3 p-2 hover:bg-white/[0.08] transition-colors">
+            <img src="${c.thumbnailPath}" class="w-28 h-20 object-cover rounded-lg flex-shrink-0" loading="lazy">
+            <div class="min-w-0 flex-1 py-1">
+              <p class="font-semibold text-sm line-clamp-2 group-hover:text-indigo-300 transition-colors">${c.title}</p>
+              <p class="text-xs text-white/40 mt-1">${c.user.username}</p>
+              <p class="text-xs text-white/20">${c.views} views</p>
+            </div>
+          </a>
+        `).join('');
+      } catch (e) { /* ignore */ }
+    }
+
+    // Theater mode
+    document.getElementById('theaterBtn').addEventListener('click', () => {
+      const container = document.getElementById('playerContainer');
+      container.classList.toggle('!max-w-none');
+      container.classList.toggle('!mx-0');
+      container.classList.toggle('!rounded-none');
+    });
+
+    // Playback speed
+    document.getElementById('playbackSpeed').addEventListener('change', (e) => {
+      document.getElementById('mainVideo').playbackRate = parseFloat(e.target.value);
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      const video = document.getElementById('mainVideo');
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      switch(e.key) {
+        case ' ':
+          e.preventDefault();
+          video.paused ? video.play() : video.pause();
+          break;
+        case 'f':
+        case 'F':
+          if (document.fullscreenElement) document.exitFullscreen();
+          else video.requestFullscreen();
+          break;
+        case 'ArrowLeft':
+          video.currentTime = Math.max(0, video.currentTime - 5);
+          break;
+        case 'ArrowRight':
+          video.currentTime = Math.min(video.duration, video.currentTime + 5);
+          break;
+        case 'ArrowUp':
+          e.preventDefault();
+          video.volume = Math.min(1, video.volume + 0.1);
+          break;
+        case 'ArrowDown':
+          e.preventDefault();
+          video.volume = Math.max(0, video.volume - 0.1);
+          break;
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', loadClipPage);
+  </script>
+  <script src="js/leaderboard-bar.js"></script>
+  <script src="js/settings.js"></script>
+</body>

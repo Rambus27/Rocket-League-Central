@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Playlists - Rocket League Central</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="css/tailwind.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-[#07080f] min-h-screen text-white overflow-x-hidden" style="font-family:'Inter',system-ui,sans-serif">
+
+  <div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+    <div class="orb orb-cyan w-[400px] h-[400px] -top-40 right-1/4 animate-drift"></div>
+    <div class="orb orb-blue w-[300px] h-[300px] bottom-0 -left-20 animate-drift" style="animation-delay:-8s"></div>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="fixed top-0 w-full z-50 backdrop-blur-md bg-black/40 border-b border-white/[0.06]">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <a href="Home.html" class="flex items-center gap-3 group">
+        <img src="logo.png" alt="RL Central" class="w-10 h-10 rounded-xl shadow-lg shadow-indigo-500/20 group-hover:shadow-indigo-500/40 transition-shadow object-cover">
+        <span class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">RL Central</span>
+      </a>
+      <div class="flex items-center gap-3">
+        <a href="upload.html" class="btn-primary !py-2 !px-5 text-sm flex items-center gap-2">
+          <i class="fas fa-plus"></i><span class="hidden sm:inline">Upload</span>
+        </a>
+        <div id="userMenu" style="display:none" class="relative flex items-center gap-2 glass rounded-full px-3 py-1.5 cursor-pointer" onclick="toggleProfileDropdown(event)">
+          <img id="userAvatar" class="w-8 h-8 rounded-full ring-2 ring-indigo-500/30" src="">
+          <span id="username" class="font-medium text-sm hidden sm:block"></span>
+          <i class="fas fa-chevron-down text-xs text-white/40 ml-1"></i>
+          <div id="profileDropdown" class="hidden absolute top-full right-0 mt-2 w-52 glass-card rounded-2xl py-2 shadow-2xl z-[100] border border-white/[0.08]">
+            <a href="profile.html" class="flex items-center gap-3 px-4 py-2.5 text-sm text-white/70 hover:text-white hover:bg-white/[0.06] transition-colors"><i class="fas fa-user text-indigo-400 w-5 text-center"></i> Profile</a>
+            <a href="dashboard.html" class="flex items-center gap-3 px-4 py-2.5 text-sm text-white/70 hover:text-white hover:bg-white/[0.06] transition-colors"><i class="fas fa-th-large text-cyan-400 w-5 text-center"></i> Dashboard</a>
+            <div class="border-t border-white/[0.06] my-1"></div>
+            <a href="/auth/logout" class="flex items-center gap-3 px-4 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-white/[0.06] transition-colors"><i class="fas fa-sign-out-alt w-5 text-center"></i> Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="pt-28 pb-16 max-w-7xl mx-auto px-6">
+    <!-- Playlist Detail View (if ?id= param) -->
+    <div id="playlistDetail" class="hidden">
+      <div class="mb-8 slide-in">
+        <a href="playlists.html" class="text-sm text-white/40 hover:text-white/60 transition-colors mb-4 inline-block"><i class="fas fa-arrow-left mr-2"></i>Back to Playlists</a>
+        <h1 id="playlistTitle" class="text-4xl font-black tracking-tight mb-2"></h1>
+        <p id="playlistDesc" class="text-white/40 mb-4"></p>
+        <p id="playlistMeta" class="text-sm text-white/25"></p>
+      </div>
+      <div id="playlistClips" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 stagger"></div>
+    </div>
+
+    <!-- Playlists List View -->
+    <div id="playlistsList">
+      <div class="text-center mb-12 slide-in">
+        <div class="inline-flex items-center gap-2 badge mb-6">
+          <i class="fas fa-list text-xs"></i> Playlists
+        </div>
+        <h1 class="text-5xl font-black tracking-tight mb-4">Playlists</h1>
+        <p class="text-white/40 text-lg">Browse curated clip collections</p>
+      </div>
+
+      <div class="flex justify-between items-center mb-8">
+        <h2 class="text-xl font-bold">Your Playlists</h2>
+        <button onclick="createPlaylist()" class="btn-primary !py-2 !px-5 text-sm !rounded-xl" id="createPlaylistBtn" style="display:none">
+          <i class="fas fa-plus mr-1.5"></i>New Playlist
+        </button>
+      </div>
+      <div id="myPlaylists" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+        <p class="text-white/30 text-sm italic col-span-full" id="myPlaylistsEmpty">Login to see your playlists</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer py-10 mt-8">
+    <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <img src="logo.png" alt="RL Central" class="w-8 h-8 rounded-lg object-cover">
+        <span class="font-bold text-white/40">RL Central</span>
+      </div>
+      <div class="flex flex-wrap items-center justify-center gap-4 text-sm text-white/30">
+        <a href="Home.html" class="hover:text-white/60 transition-colors">Home</a>
+        <a href="highlights.html" class="hover:text-white/60 transition-colors">Highlights</a>
+        <a href="contests.html" class="hover:text-white/60 transition-colors">Contests</a>
+      </div>
+      <p class="text-xs text-white/20">&copy; 2026 Rocket League Central</p>
+    </div>
+  </footer>
+
+  <!-- Mobile Bottom Nav -->
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 glass border-t border-white/[0.08] pb-safe">
+    <div class="flex items-center justify-around py-2">
+      <a href="Home.html" class="flex flex-col items-center gap-0.5 px-3 py-1 text-white/50"><i class="fas fa-home text-lg"></i><span class="text-[10px]">Home</span></a>
+      <a href="trending.html" class="flex flex-col items-center gap-0.5 px-3 py-1 text-white/50"><i class="fas fa-fire text-lg"></i><span class="text-[10px]">Trending</span></a>
+      <a href="upload.html" class="flex flex-col items-center gap-0.5 px-3 py-1"><div class="w-10 h-10 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center -mt-4 shadow-lg shadow-indigo-500/30"><i class="fas fa-plus text-white"></i></div><span class="text-[10px] text-white/50">Upload</span></a>
+      <a href="search.html" class="flex flex-col items-center gap-0.5 px-3 py-1 text-white/50"><i class="fas fa-search text-lg"></i><span class="text-[10px]">Search</span></a>
+      <a href="dashboard.html" class="flex flex-col items-center gap-0.5 px-3 py-1 text-white/50"><i class="fas fa-user text-lg"></i><span class="text-[10px]">Profile</span></a>
+    </div>
+  </nav>
+
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const playlistId = urlParams.get('id');
+
+    async function init() {
+      const user = await checkAuth();
+      if (playlistId) {
+        document.getElementById('playlistsList').classList.add('hidden');
+        document.getElementById('playlistDetail').classList.remove('hidden');
+        loadPlaylistDetail(playlistId);
+      } else {
+        if (user) {
+          document.getElementById('createPlaylistBtn').style.display = '';
+          loadMyPlaylists();
+        }
+      }
+    }
+
+    async function loadMyPlaylists() {
+      try {
+        const res = await fetch('/api/playlists/mine', { credentials: 'include' });
+        const playlists = await res.json();
+        const container = document.getElementById('myPlaylists');
+        if (!playlists.length) {
+          container.innerHTML = '<p class="text-white/30 text-sm italic col-span-full">No playlists yet. Create one!</p>';
+          return;
+        }
+        container.innerHTML = playlists.map(p => `
+          <a href="playlists.html?id=${p._id}" class="glass-card rounded-2xl p-6 hover:border-cyan-500/20 transition-colors group">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-12 h-12 rounded-xl bg-cyan-500/15 flex items-center justify-center">
+                <i class="fas fa-list text-cyan-400 text-lg"></i>
+              </div>
+              <div class="flex-1 min-w-0">
+                <h3 class="font-bold group-hover:text-cyan-300 transition-colors truncate">${p.name}</h3>
+                <p class="text-xs text-white/30">${(p.clips || []).length} clips &middot; ${p.isPublic ? 'Public' : 'Private'}</p>
+              </div>
+            </div>
+            ${p.description ? `<p class="text-sm text-white/40 line-clamp-2">${p.description}</p>` : ''}
+          </a>
+        `).join('');
+      } catch(e) {}
+    }
+
+    async function loadPlaylistDetail(id) {
+      try {
+        const res = await fetch(`/api/playlists/${id}`);
+        const playlist = await res.json();
+        document.getElementById('playlistTitle').textContent = playlist.name;
+        document.getElementById('playlistDesc').textContent = playlist.description || '';
+        document.getElementById('playlistMeta').textContent = `${(playlist.clips || []).length} clips &middot; Created by ${playlist.user?.username || 'Unknown'}`;
+        const container = document.getElementById('playlistClips');
+        if (!playlist.clips || !playlist.clips.length) {
+          container.innerHTML = '<p class="text-white/30 text-sm italic col-span-full">This playlist is empty</p>';
+          return;
+        }
+        container.innerHTML = playlist.clips.map(c => renderClipCard(c)).join('');
+      } catch(e) {
+        document.getElementById('playlistClips').innerHTML = '<p class="text-red-400 text-sm col-span-full">Failed to load playlist</p>';
+      }
+    }
+
+    async function createPlaylist() {
+      const name = prompt('Playlist name:');
+      if (!name || !name.trim()) return;
+      const desc = prompt('Description (optional):') || '';
+      try {
+        const res = await fetch('/api/playlists', {
+          method: 'POST', credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: name.trim(), description: desc.trim() })
+        });
+        if (res.ok) {
+          const pl = await res.json();
+          window.location.href = `playlists.html?id=${pl._id}`;
+        } else alert('Failed to create playlist');
+      } catch(e) { alert('Failed to create playlist'); }
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+  <script src="js/leaderboard-bar.js"></script>
+  <script src="js/settings.js"></script>
+</body>
+</html>
